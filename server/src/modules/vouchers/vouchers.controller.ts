@@ -37,10 +37,7 @@ export class VouchersController {
   }
 
   @Put(':id')
-  async updateVoucher(
-    @Param('id') id: string,
-    @Body() dto: UpdateVoucherDto,
-  ) {
+  async updateVoucher(@Param('id') id: string, @Body() dto: UpdateVoucherDto) {
     return this.vouchersService.updateVoucher(id, dto);
   }
 

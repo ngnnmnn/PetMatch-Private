@@ -1,7 +1,9 @@
 node_modules
 /dist
-.env
-.env.*
+# env files (cho phep commit .env va .env.local tren private repo)
+.env*
+!.env
+!.env.local
 db.env
 /generated/prisma
 *.tsbuildinfo

@@ -178,14 +178,23 @@ function removeVietnameseTones(str: string): string {
 /**
  * Tra cứu toạ độ Phường/Xã tại Hà Nội
  */
-export function getHanoiWardCoords(wardName?: string | null): { lat: number; lng: number } {
+export function getHanoiWardCoords(wardName?: string | null): {
+  lat: number;
+  lng: number;
+} {
   if (!wardName) {
     return { lat: 21.0285, lng: 105.8542 }; // Mặc định Hoàn Kiếm, Hà Nội
   }
   const cleanTarget = removeVietnameseTones(wardName);
   const found = HANOI_WARDS.find((w) => {
     const cleanW = removeVietnameseTones(w.name);
-    return cleanW === cleanTarget || cleanTarget.includes(cleanW) || cleanW.includes(cleanTarget);
+    return (
+      cleanW === cleanTarget ||
+      cleanTarget.includes(cleanW) ||
+      cleanW.includes(cleanTarget)
+    );
   });
-  return found ? { lat: found.lat, lng: found.lng } : { lat: 21.0285, lng: 105.8542 };
+  return found
+    ? { lat: found.lat, lng: found.lng }
+    : { lat: 21.0285, lng: 105.8542 };
 }

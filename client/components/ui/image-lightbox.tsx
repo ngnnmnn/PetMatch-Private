@@ -17,9 +17,15 @@ const SCALE_STEP = 0.25;
 export function ImageLightbox({ imageUrl, alt = 'Ảnh xem trước', onClose }: ImageLightboxProps) {
   const [scale, setScale] = useState(MIN_SCALE);
 
+  // Khởi tạo và reset tỉ lệ phóng to (scale) khi đổi ảnh mà không gây render tầng (cascading renders)
+  const [prevUrl, setPrevUrl] = useState(imageUrl);
+  if (imageUrl !== prevUrl) {
+    setPrevUrl(imageUrl);
+    setScale(MIN_SCALE);
+  }
+
   useEffect(() => {
     if (!imageUrl) return;
-    setScale(MIN_SCALE);
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
       if (event.key === '+' || event.key === '=') setScale((value) => Math.min(MAX_SCALE, value + SCALE_STEP));

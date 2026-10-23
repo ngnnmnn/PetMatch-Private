@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ShippingService } from './shipping.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -60,7 +69,11 @@ export class ShippingController {
       dropoffLat?: number;
       dropoffLng?: number;
       addressStr?: string;
-      items?: Array<{ productId: string; variantId?: string | null; quantity: number }>;
+      items?: Array<{
+        productId: string;
+        variantId?: string | null;
+        quantity: number;
+      }>;
       totalWeightKg?: number;
     },
   ) {
@@ -99,4 +112,3 @@ export class ShippingController {
     return this.shippingService.syncActiveAhamoveOrders(req.user.id);
   }
 }
-

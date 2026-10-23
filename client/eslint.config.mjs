@@ -13,6 +13,12 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Cấu hình quy tắc ESLint cho client: hạ mức no-explicit-any xuống warning để tương thích với các API tích hợp bên ngoài
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
 ]);
 
 export default eslintConfig;

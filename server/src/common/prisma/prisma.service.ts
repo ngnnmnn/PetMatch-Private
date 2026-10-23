@@ -24,7 +24,7 @@ export class PrismaService
   }
 
   // Override $transaction to set safe default timeout (20s) for remote Supabase connections
-  override $transaction: PrismaClient['$transaction'] = ((
+  override $transaction: PrismaClient['$transaction'] = (
     arg: any,
     options?: any,
   ) => {
@@ -36,8 +36,5 @@ export class PrismaService
       });
     }
     return (super.$transaction as any)(arg, options);
-  }) as unknown as PrismaClient['$transaction'];
+  };
 }
-
-
-

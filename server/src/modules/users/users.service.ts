@@ -83,7 +83,10 @@ export class UsersService {
     const variants = await tx.productVariant.findMany({
       where: { productId },
     });
-    const totalStock = variants.reduce((sum: number, v: any) => sum + v.stock, 0);
+    const totalStock = variants.reduce(
+      (sum: number, v: any) => sum + v.stock,
+      0,
+    );
     await tx.product.update({
       where: { id: productId },
       data: { stock: totalStock },
@@ -788,14 +791,19 @@ export class UsersService {
    */
   async createOrder(userId: string, dto: CreateOrderDto) {
     const payosItems: { name: string; quantity: number; price: number }[] = [];
-    const shippingEstimation = await this.shippingService.estimateAhamoveShippingFee(
-      dto.shippingLatitude,
-      dto.shippingLongitude,
-      dto.shippingAddress,
-      dto.items,
-    );
+    const shippingEstimation =
+      await this.shippingService.estimateAhamoveShippingFee(
+        dto.shippingLatitude,
+        dto.shippingLongitude,
+        dto.shippingAddress,
+        dto.items,
+      );
 
-    if (shippingEstimation.isOverweightLimit || (shippingEstimation.totalWeightKg && shippingEstimation.totalWeightKg > 30)) {
+    if (
+      shippingEstimation.isOverweightLimit ||
+      (shippingEstimation.totalWeightKg &&
+        shippingEstimation.totalWeightKg > 30)
+    ) {
       throw new BadRequestException(
         shippingEstimation.limitWarningMessage ||
           `Đơn hàng có tổng khối lượng ${shippingEstimation.totalWeightKg}kg vượt quá giới hạn 30kg vận chuyển bằng xe máy. Vui lòng tách đơn hàng hoặc liên hệ cửa hàng.`,
@@ -847,7 +855,9 @@ export class UsersService {
 
         // Kiểm tra nếu sản phẩm có biến thể nhưng tất cả biến thể đều bị tắt hoạt động
         if (product.variants && product.variants.length > 0) {
-          const activeVariants = product.variants.filter((v: any) => v.isActive !== false);
+          const activeVariants = product.variants.filter(
+            (v: any) => v.isActive !== false,
+          );
           if (activeVariants.length === 0) {
             throw new BadRequestException(
               `Sản phẩm "${product.name}" hiện đang tạm ngưng mở bán (tất cả phân loại đều ngưng kinh doanh).`,
@@ -893,7 +903,10 @@ export class UsersService {
           if (item.price !== undefined && item.price !== null) {
             const clientPrice = Number(item.price);
             if (Math.abs(clientPrice - expectedPrice) > 1) {
-              const formattedExpected = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(expectedPrice);
+              const formattedExpected = new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+              }).format(expectedPrice);
               throw new BadRequestException(
                 `Sản phẩm "${itemName}" đã bị thay đổi giá thành ${formattedExpected}. Vui lòng kiểm tra lại đơn hàng!`,
               );
@@ -946,7 +959,10 @@ export class UsersService {
           if (item.price !== undefined && item.price !== null) {
             const clientPrice = Number(item.price);
             if (Math.abs(clientPrice - expectedPrice) > 1) {
-              const formattedExpected = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(expectedPrice);
+              const formattedExpected = new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+              }).format(expectedPrice);
               throw new BadRequestException(
                 `Sản phẩm "${product.name}" đã bị thay đổi giá thành ${formattedExpected}. Vui lòng kiểm tra lại đơn hàng!`,
               );
@@ -1018,7 +1034,9 @@ export class UsersService {
         }
 
         if (voucher.startDate && voucher.startDate > new Date()) {
-          throw new BadRequestException('Mã giảm giá chưa đến thời gian sử dụng.');
+          throw new BadRequestException(
+            'Mã giảm giá chưa đến thời gian sử dụng.',
+          );
         }
 
         if (voucher.maxUsage && voucher.usedCount >= voucher.maxUsage) {
@@ -1038,12 +1056,18 @@ export class UsersService {
             discountAmount = Math.min(shippingFee, voucher.value);
           }
           if (voucher.maxDiscountAmount) {
-            discountAmount = Math.min(discountAmount, voucher.maxDiscountAmount);
+            discountAmount = Math.min(
+              discountAmount,
+              voucher.maxDiscountAmount,
+            );
           }
         } else if (voucher.type === 'PERCENTAGE') {
           discountAmount = Math.round((itemsSubtotal * voucher.value) / 100);
           if (voucher.maxDiscountAmount) {
-            discountAmount = Math.min(discountAmount, voucher.maxDiscountAmount);
+            discountAmount = Math.min(
+              discountAmount,
+              voucher.maxDiscountAmount,
+            );
           }
         } else if (voucher.type === 'FIXED') {
           discountAmount = Math.min(itemsSubtotal, voucher.value);
@@ -1276,16 +1300,19 @@ export class UsersService {
         where: { id: orderId },
         data: { status: 'CANCELLED' },
       });
-      await this.notifications.create({
-        userId,
-        category: NotificationCategory.ORDER,
-        eventType: NotificationEventType.ORDER_STATUS_CHANGED,
-        title: 'Đơn hàng đã hủy',
-        content: `Đơn hàng #${order.id.slice(-8).toUpperCase()} đã được hủy.`,
-        targetUrl: `/orders?orderId=${order.id}`,
-        entityType: 'ORDER',
-        entityId: order.id,
-      }, tx);
+      await this.notifications.create(
+        {
+          userId,
+          category: NotificationCategory.ORDER,
+          eventType: NotificationEventType.ORDER_STATUS_CHANGED,
+          title: 'Đơn hàng đã hủy',
+          content: `Đơn hàng #${order.id.slice(-8).toUpperCase()} đã được hủy.`,
+          targetUrl: `/orders?orderId=${order.id}`,
+          entityType: 'ORDER',
+          entityId: order.id,
+        },
+        tx,
+      );
       return updated;
     });
   }
@@ -1391,16 +1418,17 @@ export class UsersService {
       );
     }
 
-    const shippingEstimation = await this.shippingService.estimateAhamoveShippingFee(
-      data.shippingLatitude,
-      data.shippingLongitude,
-      data.shippingAddress,
-      order.items.map((item) => ({
-        productId: item.productId,
-        variantId: item.variantId,
-        quantity: item.quantity,
-      })),
-    );
+    const shippingEstimation =
+      await this.shippingService.estimateAhamoveShippingFee(
+        data.shippingLatitude,
+        data.shippingLongitude,
+        data.shippingAddress,
+        order.items.map((item) => ({
+          productId: item.productId,
+          variantId: item.variantId,
+          quantity: item.quantity,
+        })),
+      );
     const itemsSubtotal = order.items.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0,

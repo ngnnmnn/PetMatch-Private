@@ -1,21 +1,36 @@
 'use client';
 
+import { memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PackageCheck, Star } from 'lucide-react';
 import { Product } from '@/types';
 import { cn } from '@/lib/utils';
 
+/** Instance NumberFormat duy nhất được tái sử dụng để tránh tạo mới đối tượng trên mỗi render */
+const currencyFormatter = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+  maximumFractionDigits: 0,
+});
+
 /**
  * Định dạng số tiền theo chuẩn tiền tệ Việt Nam (VNĐ)
  */
 function formatCurrency(value: number) {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    maximumFractionDigits: 0,
-  }).format(value);
+  return currencyFormatter.format(value);
 }
+
+/** Biểu thức chính quy phát hiện giới tính mục tiêu được hoist ra module scope */
+const MALE_PHRASES_REGEX = /\b(bé đực|cho đực|dành cho đực|cho bé đực|giới tính đực|cho chó đực|cho mèo đực|bé trai|cho bé trai)\b/i;
+const MALE_KEYWORDS_REGEX = /\b(đực|trai)\b/i;
+const MALE_EXCLUSIONS_REGEX = /\b(được|đặc|trại)\b/i;
+
+const FEMALE_PHRASES_REGEX = /\b(bé cái|cho cái|dành cho cái|cho bé cái|giới tính cái|cho chó cái|cho mèo cái|bé gái|cho bé gái)\b/i;
+const FEMALE_KEYWORDS_REGEX = /\b(cái|gái)\b/i;
+const FEMALE_COUNT_REGEX = /\d+\s*cái\b/i;
+const FEMALE_UNIT_REGEX = /\bcái\s*[\/:]/i;
+const FEMALE_QUESTION_REGEX = /\b(cái gì|cái nào)\b/i;
 
 /**
  * Tính toán phần trăm giảm giá dựa trên giá bán gốc và giá khuyến mãi
@@ -84,13 +99,13 @@ export function extractGenderTarget(text: string, specs?: any): 'MALE' | 'FEMALE
 
   // 2. Phân tích từ khóa giới tính Đực / Trai
   const isMale =
-    /\b(bé đực|cho đực|dành cho đực|cho bé đực|giới tính đực|cho chó đực|cho mèo đực|bé trai|cho bé trai)\b/i.test(normText) ||
-    (/\b(đực|trai)\b/i.test(normText) && !/\b(được|đặc|trại)\b/i.test(normText));
+    MALE_PHRASES_REGEX.test(normText) ||
+    (MALE_KEYWORDS_REGEX.test(normText) && !MALE_EXCLUSIONS_REGEX.test(normText));
 
   // 3. Phân tích từ khóa giới tính Cái / Gái (tránh nhầm từ 'cái' trong số đếm '1 cái', '2 cái' hoặc 'cái/hộp')
   const isFemale =
-    /\b(bé cái|cho cái|dành cho cái|cho bé cái|giới tính cái|cho chó cái|cho mèo cái|bé gái|cho bé gái)\b/i.test(normText) ||
-    (/\b(cái|gái)\b/i.test(normText) && !/\d+\s*cái\b/i.test(normText) && !/\bcái\s*[\/:]/i.test(normText) && !/\b(cái gì|cái nào)\b/i.test(normText));
+    FEMALE_PHRASES_REGEX.test(normText) ||
+    (FEMALE_KEYWORDS_REGEX.test(normText) && !FEMALE_COUNT_REGEX.test(normText) && !FEMALE_UNIT_REGEX.test(normText) && !FEMALE_QUESTION_REGEX.test(normText));
 
   if (isMale && !isFemale) return 'MALE';
   if (isFemale && !isMale) return 'FEMALE';
@@ -352,7 +367,7 @@ export function findRecommendedVariantForPet(product: any, pet: any): any | null
  * - Hiển thị giá thấp nhất hoặc giá phân loại được gợi ý cho thú cưng
  * - Gắn badge phân loại đề xuất phù hợp với thể trạng thú cưng
  */
-export default function ProductCard({
+function ProductCardComponent({
   product,
   selectedPet,
 }: {
@@ -399,11 +414,11 @@ export default function ProductCard({
 
   return (
     <article
-      className="group relative rounded-2xl border border-[var(--border-color)] bg-white shadow-[0_8px_24px_rgba(26,26,26,0.04)] transition hover:-translate-y-1 hover:border-[#DED8D0] hover:shadow-[0_18px_40px_rgba(26,26,26,0.10)] flex flex-col h-full justify-between overflow-hidden"
+      className="group relative rounded-2xl border border-[#ECE7DF] bg-white shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#D8D2C5] hover:shadow-xl hover:shadow-stone-900/5 flex flex-col h-full justify-between overflow-hidden"
     >
       <Link href={productDetailUrl} className="flex flex-col h-full justify-between">
         <div>
-          <div className="relative aspect-square overflow-hidden bg-[#F3F0EA]">
+          <div className="relative aspect-square overflow-hidden bg-[#F7F5F0]">
             <Image
               src={productImage}
               alt={product.name}
@@ -459,10 +474,10 @@ export default function ProductCard({
 
           <div className="space-y-2.5 p-4">
             <div className="min-h-[3.25rem]">
-              <p className="truncate text-xs font-bold uppercase tracking-[0.08em] text-[#0F766E]">
+              <p className="truncate text-xs font-bold uppercase tracking-[0.08em] text-stone-500">
                 {product.brand || 'PetMatch'}
               </p>
-              <h3 className="mt-1 line-clamp-2 text-sm font-bold leading-5 text-[var(--text-main)] transition duration-200 group-hover:text-[var(--primary-color)]">
+              <h3 className="mt-1 line-clamp-2 text-sm font-bold font-heading leading-5 text-stone-900 transition duration-200 group-hover:text-[var(--primary-color)]">
                 {product.name}
               </h3>
             </div>
@@ -471,24 +486,24 @@ export default function ProductCard({
               <div className="flex items-center gap-2">
                 {product.reviewCount > 0 ? (
                   <span className="inline-flex items-center gap-1">
-                    <Star className="size-3.5 fill-[#F59E0B] text-[#F59E0B]" />
-                    <span className="font-semibold text-[var(--text-main)]">{product.rating.toFixed(1)}</span>
+                    <Star className="size-3.5 fill-amber-400 text-amber-400" />
+                    <span className="font-semibold text-stone-900">{product.rating.toFixed(1)}</span>
                     <span>({product.reviewCount})</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-gray-400">
-                    <Star className="size-3.5 text-gray-300 fill-gray-100" />
+                  <span className="inline-flex items-center gap-1 text-stone-400">
+                    <Star className="size-3.5 text-stone-300 fill-stone-100" />
                     <span className="font-medium text-[11px]">Mới</span>
                   </span>
                 )}
                 {typeof product.soldCount === 'number' && product.soldCount > 0 && (
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                     Đã bán {product.soldCount >= 1000 ? `${(product.soldCount / 1000).toFixed(1)}k` : product.soldCount}
                   </span>
                 )}
               </div>
-              <span className="inline-flex items-center gap-1 rounded-md bg-[#EEF8F5] px-2 py-1 font-semibold text-[#0F766E]">
-                <PackageCheck className="size-3.5" />
+              <span className="inline-flex items-center gap-1 rounded-md bg-stone-100 px-2 py-0.5 font-semibold text-stone-700 text-[11px]">
+                <PackageCheck className="size-3.5 text-stone-500" />
                 {speciesLabel}
               </span>
             </div>
@@ -522,3 +537,6 @@ export default function ProductCard({
     </article>
   );
 }
+
+/** Tối ưu Re-render bằng React.memo theo tiêu chuẩn Vercel React Best Practices */
+export default memo(ProductCardComponent);

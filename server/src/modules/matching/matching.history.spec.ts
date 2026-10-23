@@ -42,7 +42,11 @@ describe('MatchingService deleted participant history', () => {
           },
         ]),
       },
-      user: { findUnique: jest.fn().mockResolvedValue({ id: 'user-1', blockedUserIds: [] }) },
+      user: {
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: 'user-1', blockedUserIds: [] }),
+      },
     };
     const service = new MatchingService(
       prisma as unknown as PrismaService,

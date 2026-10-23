@@ -5,7 +5,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { CreateVoucherDto, UpdateVoucherDto } from './dto/voucher.dto';
+import { CreateVoucherDto, UpdateVoucherDto, VoucherType } from './dto/voucher.dto';
 
 @Injectable()
 export class VouchersService {
@@ -65,7 +65,9 @@ export class VouchersService {
       discountAmount,
       message:
         voucher.type === 'FREE_SHIP'
-          ? (voucher.value === 100 || voucher.value === 0 ? 'Áp dụng mã Miễn Phí Vận Chuyển 100% thành công!' : `Áp dụng mã giảm phí vận chuyển ${voucher.value.toLocaleString('vi-VN')}đ thành công!`)
+          ? voucher.value === 100 || voucher.value === 0
+            ? 'Áp dụng mã Miễn Phí Vận Chuyển 100% thành công!'
+            : `Áp dụng mã giảm phí vận chuyển ${voucher.value.toLocaleString('vi-VN')}đ thành công!`
           : `Áp dụng mã giảm giá thành công! Giảm ${discountAmount.toLocaleString('vi-VN')}đ`,
     };
   }
@@ -76,6 +78,10 @@ export class VouchersService {
     });
   }
 
+  /**
+   * Tạo mã khuyến mãi mới
+   * Kiểm tra tính hợp lệ của mã, loại giảm giá (phần trăm hoặc số tiền cố định) và thời hạn
+   */
   async createVoucher(dto: CreateVoucherDto) {
     const cleanCode = dto.code.trim().toUpperCase();
     if (!cleanCode) {
@@ -94,10 +100,10 @@ export class VouchersService {
     if (isNaN(val) || val < 0) {
       throw new BadRequestException('Giá trị giảm không hợp lệ.');
     }
-    if (dto.type === 'PERCENTAGE' && (val <= 0 || val > 100)) {
+    if (dto.type === VoucherType.PERCENTAGE && (val <= 0 || val > 100)) {
       throw new BadRequestException('Phần trăm giảm giá phải từ 1% đến 100%.');
     }
-    if (dto.type === 'FIXED' && val <= 0) {
+    if (dto.type === VoucherType.FIXED && val <= 0) {
       throw new BadRequestException('Số tiền giảm phải lớn hơn 0đ.');
     }
 
@@ -109,7 +115,9 @@ export class VouchersService {
         throw new BadRequestException('Ngày kết thúc không hợp lệ.');
       }
       if (expiredAt <= now) {
-        throw new BadRequestException('Ngày kết thúc phải là một thời điểm trong tương lai (sau thời điểm hiện tại).');
+        throw new BadRequestException(
+          'Ngày kết thúc phải là một thời điểm trong tương lai (sau thời điểm hiện tại).',
+        );
       }
     }
 
@@ -119,7 +127,9 @@ export class VouchersService {
         type: dto.type,
         value: val,
         minOrderAmount: dto.minOrderAmount ? Number(dto.minOrderAmount) : 0,
-        maxDiscountAmount: dto.maxDiscountAmount ? Number(dto.maxDiscountAmount) : null,
+        maxDiscountAmount: dto.maxDiscountAmount
+          ? Number(dto.maxDiscountAmount)
+          : null,
         description: dto.description?.trim() || null,
         maxUsage: dto.maxUsage ? Number(dto.maxUsage) : null,
         expiredAt: expiredAt,
@@ -128,6 +138,10 @@ export class VouchersService {
     });
   }
 
+  /**
+   * Cập nhật thông tin voucher
+   * Kiểm tra mã mới có bị trùng không, kiểm tra tính hợp lệ của loại giảm giá và thời gian hết hạn
+   */
   async updateVoucher(id: string, dto: UpdateVoucherDto) {
     const existing = await this.prisma.voucher.findUnique({ where: { id } });
     if (!existing) {
@@ -153,16 +167,19 @@ export class VouchersService {
     if (isNaN(val) || val < 0) {
       throw new BadRequestException('Giá trị giảm không hợp lệ.');
     }
-    if (type === 'PERCENTAGE' && (val <= 0 || val > 100)) {
+    if (type === VoucherType.PERCENTAGE && (val <= 0 || val > 100)) {
       throw new BadRequestException('Phần trăm giảm giá phải từ 1% đến 100%.');
     }
-    if (type === 'FIXED' && val <= 0) {
+    if (type === VoucherType.FIXED && val <= 0) {
       throw new BadRequestException('Số tiền giảm phải lớn hơn 0đ.');
     }
 
-    const expiredAt = dto.expiredAt !== undefined
-      ? (dto.expiredAt ? new Date(dto.expiredAt) : null)
-      : existing.expiredAt;
+    const expiredAt =
+      dto.expiredAt !== undefined
+        ? dto.expiredAt
+          ? new Date(dto.expiredAt)
+          : null
+        : existing.expiredAt;
 
     const now = new Date();
     if (expiredAt) {
@@ -170,7 +187,9 @@ export class VouchersService {
         throw new BadRequestException('Ngày kết thúc không hợp lệ.');
       }
       if (expiredAt <= now) {
-        throw new BadRequestException('Ngày kết thúc phải là một thời điểm trong tương lai (sau thời điểm hiện tại).');
+        throw new BadRequestException(
+          'Ngày kết thúc phải là một thời điểm trong tương lai (sau thời điểm hiện tại).',
+        );
       }
     }
 
@@ -186,7 +205,9 @@ export class VouchersService {
             : existing.minOrderAmount,
         maxDiscountAmount:
           dto.maxDiscountAmount !== undefined
-            ? dto.maxDiscountAmount ? Number(dto.maxDiscountAmount) : null
+            ? dto.maxDiscountAmount
+              ? Number(dto.maxDiscountAmount)
+              : null
             : existing.maxDiscountAmount,
         description:
           dto.description !== undefined
@@ -194,7 +215,9 @@ export class VouchersService {
             : existing.description,
         maxUsage:
           dto.maxUsage !== undefined
-            ? dto.maxUsage ? Number(dto.maxUsage) : null
+            ? dto.maxUsage
+              ? Number(dto.maxUsage)
+              : null
             : existing.maxUsage,
         expiredAt: expiredAt,
         isActive: dto.isActive !== undefined ? dto.isActive : existing.isActive,

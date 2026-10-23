@@ -146,20 +146,18 @@ describe('Admin dashboard optimized queries', () => {
       groupBy: jest
         .fn()
         .mockResolvedValue([{ serviceId: 'main-1', _count: { _all: 4 } }]),
-      findMany: jest
-        .fn()
-        .mockResolvedValue([
-          {
-            serviceId: 'main-1',
-            mainServiceId: 'main-1',
-            subServiceIds: ['extra-1', 'extra-2'],
-          },
-          {
-            serviceId: null,
-            mainServiceId: null,
-            subServiceIds: ['extra-1'],
-          },
-        ]),
+      findMany: jest.fn().mockResolvedValue([
+        {
+          serviceId: 'main-1',
+          mainServiceId: 'main-1',
+          subServiceIds: ['extra-1', 'extra-2'],
+        },
+        {
+          serviceId: null,
+          mainServiceId: null,
+          subServiceIds: ['extra-1'],
+        },
+      ]),
     };
     const service = new AdminSpaServicesService({
       spaService: {

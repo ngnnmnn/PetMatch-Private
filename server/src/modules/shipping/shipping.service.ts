@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { HANOI_WARDS } from '../matching/hanoi-wards';
 import { ShippingSimulatorService } from './shipping-simulator.service';
@@ -85,10 +90,19 @@ export class ShippingService {
     lng: number;
   } {
     const addr = (addressStr || '').toLowerCase();
-    if (addr.includes('hòa lạc') || addr.includes('hoa lac') || addr.includes('thạch hòa') || addr.includes('tiến xuân')) {
+    if (
+      addr.includes('hòa lạc') ||
+      addr.includes('hoa lac') ||
+      addr.includes('thạch hòa') ||
+      addr.includes('tiến xuân')
+    ) {
       return { lat: 21.0188, lng: 105.5264 }; // Tọa độ GPS khu vực Hòa Lạc - Thạch Thất (33.81 km)
     }
-    if (addr.includes('xuân mai') || addr.includes('xuan mai') || addr.includes('chúc sơn')) {
+    if (
+      addr.includes('xuân mai') ||
+      addr.includes('xuan mai') ||
+      addr.includes('chúc sơn')
+    ) {
       return { lat: 20.8833, lng: 105.7 };
     }
     if (addr.includes('sơn tây') || addr.includes('son tay')) {
@@ -99,7 +113,12 @@ export class ShippingService {
     }
     if (addr.includes('hoàn kiếm')) return { lat: 21.0285, lng: 105.8542 };
     if (addr.includes('hai bà trưng')) return { lat: 21.0069, lng: 105.8432 };
-    if (addr.includes('đống đa') || addr.includes('đường láng') || addr.includes('láng')) return { lat: 21.0125, lng: 105.8272 };
+    if (
+      addr.includes('đống đa') ||
+      addr.includes('đường láng') ||
+      addr.includes('láng')
+    )
+      return { lat: 21.0125, lng: 105.8272 };
     if (addr.includes('ba đình')) return { lat: 21.0333, lng: 105.8233 };
     if (addr.includes('cầu giấy')) return { lat: 21.0362, lng: 105.7905 };
     if (addr.includes('thanh xuân')) return { lat: 20.998, lng: 105.808 };
@@ -132,7 +151,11 @@ export class ShippingService {
   /**
    * Ưu tiên tọa độ OpenStreetMap đã lưu; chỉ suy ra từ chuỗi địa chỉ cho dữ liệu cũ chưa có tọa độ.
    */
-  private resolveCoordinates(latitude: number | null | undefined, longitude: number | null | undefined, address: string): { lat: number; lng: number } {
+  private resolveCoordinates(
+    latitude: number | null | undefined,
+    longitude: number | null | undefined,
+    address: string,
+  ): { lat: number; lng: number } {
     if (
       typeof latitude === 'number' &&
       Number.isFinite(latitude) &&
@@ -172,10 +195,16 @@ export class ShippingService {
     const phone = store.phone?.trim();
     const address = store.address?.trim();
     if (!name || !phone || !address) {
-      throw new BadRequestException('Vui lòng cập nhật đầy đủ tên, số điện thoại và địa chỉ cửa hàng trong trang Admin.');
+      throw new BadRequestException(
+        'Vui lòng cập nhật đầy đủ tên, số điện thoại và địa chỉ cửa hàng trong trang Admin.',
+      );
     }
 
-    const coordinates = this.resolveCoordinates(store.latitude, store.longitude, address);
+    const coordinates = this.resolveCoordinates(
+      store.latitude,
+      store.longitude,
+      address,
+    );
 
     return {
       name,
@@ -217,9 +246,11 @@ export class ShippingService {
 
     let ahamoveOrderCode = '';
     let isRealAhamoveCreated = false;
-    const apiKey = process.env.AHAMOVE_API_KEY || 'sk_test_1oSlooJ79RRzEzAPV4xHQfEQEmuC0FYe';
+    const apiKey =
+      process.env.AHAMOVE_API_KEY || 'sk_test_1oSlooJ79RRzEzAPV4xHQfEQEmuC0FYe';
     const mobile = process.env.AHAMOVE_MOBILE || '84869098696';
-    const baseUrl = process.env.AHAMOVE_API_URL || 'https://partner-apistg.ahamove.com';
+    const baseUrl =
+      process.env.AHAMOVE_API_URL || 'https://partner-apistg.ahamove.com';
 
     try {
       // 1. Lấy Bearer Token chính thức từ AhaMove Staging cho số điện thoại đối tác
@@ -234,18 +265,38 @@ export class ShippingService {
       if (token) {
         // 2. Điểm lấy hàng luôn dùng thông tin Store do Admin quản lý.
         // 3. Phân tích địa chỉ giao hàng động do khách tự chọn khi Checkout (Tách riêng địa chỉ sạch, tên và SĐT người nhận)
-        const parsedAddress = this.parseShippingAddressHelper(order.shippingAddress || '');
-        const dropoffAddress = parsedAddress.address || 'Số 100 Phố Huế, Hai Bà Trưng, Hà Nội';
-        const recipientName = parsedAddress.name || order.customerNameSnapshot || order.user?.name || 'Khách hàng PetMatching';
-        const recipientPhone = parsedAddress.phone || order.customerPhoneSnapshot || order.user?.phone || '0988888888';
-        const dropoffCoords = this.resolveCoordinates(order.shippingLatitude, order.shippingLongitude, dropoffAddress);
+        const parsedAddress = this.parseShippingAddressHelper(
+          order.shippingAddress || '',
+        );
+        const dropoffAddress =
+          parsedAddress.address || 'Số 100 Phố Huế, Hai Bà Trưng, Hà Nội';
+        const recipientName =
+          parsedAddress.name ||
+          order.customerNameSnapshot ||
+          order.user?.name ||
+          'Khách hàng PetMatching';
+        const recipientPhone =
+          parsedAddress.phone ||
+          order.customerPhoneSnapshot ||
+          order.user?.phone ||
+          '0988888888';
+        const dropoffCoords = this.resolveCoordinates(
+          order.shippingLatitude,
+          order.shippingLongitude,
+          dropoffAddress,
+        );
 
         // 4. Tính toán tổng tiền thu COD từ khách hàng
         // Nếu đơn hàng thanh toán COD: thu đúng tổng giá trị đơn hàng (order.totalAmount - đã bao gồm tiền sản phẩm & phí ship)
         // Nếu đơn hàng đã thanh toán online (PayOS/QR status = 'PAID'): COD = 0 (tài xế chỉ giao hàng, không thu thêm tiền)
         const isAlreadyPaid = order.payment?.status === 'PAID';
-        const codAmount = isAlreadyPaid ? 0 : Math.round(Number(order.totalAmount || 0));
-        const remarksText = codAmount > 0 ? `[PETMATCHING] Thu COD người nhận: ${codAmount.toLocaleString('vi-VN')}đ (Đơn hàng #${order.id})` : `[PETMATCHING] Đã thanh toán Online (Không thu tiền khách - Đơn hàng #${order.id})`;
+        const codAmount = isAlreadyPaid
+          ? 0
+          : Math.round(Number(order.totalAmount || 0));
+        const remarksText =
+          codAmount > 0
+            ? `[PETMATCHING] Thu COD người nhận: ${codAmount.toLocaleString('vi-VN')}đ (Đơn hàng #${order.id})`
+            : `[PETMATCHING] Đã thanh toán Online (Không thu tiền khách - Đơn hàng #${order.id})`;
 
         const body: any = {
           service_id: 'HAN-BIKE',
@@ -290,7 +341,9 @@ export class ShippingService {
 
         // Xử lý tự động: Nếu tài khoản Sandbox/Staging AhaMove giới hạn max_cod = 0đ (INVALID_MAX_COD), tự động chuyển cod ở nấc giao thành 0 và lưu ghi chú COD trong remarks để tạo vận đơn thật thành công
         if (!response.ok && data?.code === 'INVALID_MAX_COD' && codAmount > 0) {
-          this.logger.warn(`[AhaMove Staging Notice] Tài khoản Staging bị giới hạn COD max = 0đ, tự động nạp COD vào Ghi chú (Remarks) để tạo vận đơn Staging thành công...`);
+          this.logger.warn(
+            `[AhaMove Staging Notice] Tài khoản Staging bị giới hạn COD max = 0đ, tự động nạp COD vào Ghi chú (Remarks) để tạo vận đơn Staging thành công...`,
+          );
           body.path[1].cod = 0;
           response = await fetch(`${baseUrl}/v3/orders`, {
             method: 'POST',
@@ -306,9 +359,13 @@ export class ShippingService {
         if (data && (data.order_id || data._id || data.shared_link_id)) {
           ahamoveOrderCode = data.order_id || data._id || data.shared_link_id;
           isRealAhamoveCreated = true;
-          this.logger.log(`[AhaMove Staging SUCCESS] Đã tạo đơn thành công trên Dashboard AhaMove: ID=${ahamoveOrderCode}`);
+          this.logger.log(
+            `[AhaMove Staging SUCCESS] Đã tạo đơn thành công trên Dashboard AhaMove: ID=${ahamoveOrderCode}`,
+          );
         } else {
-          this.logger.warn(`[AhaMove Sandbox API Warning] ${JSON.stringify(data)}`);
+          this.logger.warn(
+            `[AhaMove Sandbox API Warning] ${JSON.stringify(data)}`,
+          );
         }
       }
     } catch (err: any) {
@@ -320,14 +377,17 @@ export class ShippingService {
     }
 
     // Cập nhật trạng thái đơn hàng trong Database: khi vừa đẩy đơn sang AhaMove -> lưu shippingStatus: ASSIGNING, giữ nguyên status order cho đến khi tài xế nhận đơn
-    const initialOrderStatus = order.status === 'PENDING' ? 'CONFIRMED' : order.status;
+    const initialOrderStatus =
+      order.status === 'PENDING' ? 'CONFIRMED' : order.status;
     const updatedOrder = await this.prisma.order.update({
       where: { id: orderId },
       data: {
         ahamoveOrderCode,
         shippingStatus: 'ASSIGNING',
         status: initialOrderStatus,
-        shippingNote: isRealAhamoveCreated ? 'Đã phát đơn thành công lên Dashboard AhaMove Staging (business-stg.ahamove.com), đang quét tìm tài xế' : 'Đã tạo vận đơn hỏa tốc AhaMove Sandbox (Tự động giả lập tiến trình)',
+        shippingNote: isRealAhamoveCreated
+          ? 'Đã phát đơn thành công lên Dashboard AhaMove Staging (business-stg.ahamove.com), đang quét tìm tài xế'
+          : 'Đã tạo vận đơn hỏa tốc AhaMove Sandbox (Tự động giả lập tiến trình)',
       },
     });
 
@@ -338,7 +398,9 @@ export class ShippingService {
 
     return {
       success: true,
-      message: isRealAhamoveCreated ? `Đã đẩy đơn thành công lên AhaMove Portal! Mã đơn: ${ahamoveOrderCode}` : `Đã tạo đơn hỏa tốc AhaMove Sandbox! Mã: ${ahamoveOrderCode}`,
+      message: isRealAhamoveCreated
+        ? `Đã đẩy đơn thành công lên AhaMove Portal! Mã đơn: ${ahamoveOrderCode}`
+        : `Đã tạo đơn hỏa tốc AhaMove Sandbox! Mã: ${ahamoveOrderCode}`,
       ahamoveOrderCode,
       order: updatedOrder,
     };
@@ -351,9 +413,16 @@ export class ShippingService {
    * @param payload Dữ liệu webhook gửi từ AhaMove Sandbox
    */
   async handleAhamoveWebhook(payload: any) {
-    this.logger.log(`[AhaMove Webhook] Nhận payload: ${JSON.stringify(payload)}`);
+    this.logger.log(
+      `[AhaMove Webhook] Nhận payload: ${JSON.stringify(payload)}`,
+    );
 
-    const orderCode = payload.order_id || payload.order_code || payload.shared_link_id || payload.id || payload._id;
+    const orderCode =
+      payload.order_id ||
+      payload.order_code ||
+      payload.shared_link_id ||
+      payload.id ||
+      payload._id;
     const status = (payload.status || payload.order_status || '').toUpperCase();
 
     if (!orderCode) {
@@ -371,7 +440,9 @@ export class ShippingService {
     });
 
     if (!order) {
-      this.logger.warn(`[AhaMove Webhook] Không tìm thấy đơn hàng khớp với mã ${orderCode}`);
+      this.logger.warn(
+        `[AhaMove Webhook] Không tìm thấy đơn hàng khớp với mã ${orderCode}`,
+      );
       return { success: false, message: 'Không tìm thấy đơn hàng tương ứng' };
     }
 
@@ -389,7 +460,8 @@ export class ShippingService {
       case 'CONFIRMED':
         // Tài xế đã nhận đơn, đang di chuyển tới Shop lấy hàng -> Giữ nguyên trạng thái đơn CONFIRMED, cập nhật thông tin tài xế
         targetStatus = order.status;
-        note = 'Tài xế AhaMove đã nhận đơn hàng và đang di chuyển tới Shop lấy hàng';
+        note =
+          'Tài xế AhaMove đã nhận đơn hàng và đang di chuyển tới Shop lấy hàng';
         break;
       case 'IN_PROCESS':
       case 'IN PROCESS':
@@ -399,7 +471,8 @@ export class ShippingService {
       case 'PICKED':
         // Tài xế đã lấy hàng tại Shop và đang thực hiện di chuyển giao tới khách -> Chuyển sang SHIPPED (Đang giao)
         targetStatus = 'SHIPPED';
-        note = 'Tài xế AhaMove đã lấy hàng thành công và đang hỏa tốc vận chuyển tới khách (Đang giao)';
+        note =
+          'Tài xế AhaMove đã lấy hàng thành công và đang hỏa tốc vận chuyển tới khách (Đang giao)';
         break;
       case 'COMPLETED':
       case 'DELIVERED':
@@ -429,15 +502,24 @@ export class ShippingService {
     });
 
     // Tự động thanh toán cho đơn hàng COD khi giao hàng thành công từ AhaMove
-    if (targetStatus === 'DELIVERED' && order.payment && order.payment.method === 'COD' && order.payment.status !== 'PAID') {
+    if (
+      targetStatus === 'DELIVERED' &&
+      order.payment &&
+      order.payment.method === 'COD' &&
+      order.payment.status !== 'PAID'
+    ) {
       await this.prisma.payment.update({
         where: { id: order.payment.id },
         data: { status: 'PAID', paidAt: new Date() },
       });
-      this.logger.log(`[AhaMove Webhook] Tự động cập nhật thanh toán COD sang PAID cho đơn ${order.id}`);
+      this.logger.log(
+        `[AhaMove Webhook] Tự động cập nhật thanh toán COD sang PAID cho đơn ${order.id}`,
+      );
     }
 
-    this.logger.log(`[AhaMove Webhook Updated] Đơn ${order.id} -> Status: ${targetStatus} (${status})`);
+    this.logger.log(
+      `[AhaMove Webhook Updated] Đơn ${order.id} -> Status: ${targetStatus} (${status})`,
+    );
     return { success: true, message: 'Cập nhật Webhook AhaMove thành công' };
   }
 
@@ -456,14 +538,24 @@ export class ShippingService {
     dropoffLat?: number,
     dropoffLng?: number,
     addressStr?: string,
-    items?: Array<{ productId: string; variantId?: string | null; quantity: number }>,
+    items?: Array<{
+      productId: string;
+      variantId?: string | null;
+      quantity: number;
+    }>,
     customWeightKg?: number,
   ) {
     const pickup = await this.getStorePickupPoint();
-    const dropoff = this.resolveCoordinates(dropoffLat, dropoffLng, addressStr || '');
-    const apiKey = process.env.AHAMOVE_API_KEY || 'sk_test_1oSlooJ79RRzEzAPV4xHQfEQEmuC0FYe';
+    const dropoff = this.resolveCoordinates(
+      dropoffLat,
+      dropoffLng,
+      addressStr || '',
+    );
+    const apiKey =
+      process.env.AHAMOVE_API_KEY || 'sk_test_1oSlooJ79RRzEzAPV4xHQfEQEmuC0FYe';
     const mobile = process.env.AHAMOVE_MOBILE || '84869098696';
-    const baseUrl = process.env.AHAMOVE_API_URL || 'https://partner-apistg.ahamove.com';
+    const baseUrl =
+      process.env.AHAMOVE_API_URL || 'https://partner-apistg.ahamove.com';
 
     let estimatedFee = 30000;
     let isRealAhamoveFee = false;
@@ -553,12 +645,15 @@ export class ShippingService {
             feeData?.total_fee ||
             feeData?.total_price ||
             feeData?.fee ||
-            (Array.isArray(feeData) && (feeData[0]?.total_price || feeData[0]?.fee));
+            (Array.isArray(feeData) &&
+              (feeData[0]?.total_price || feeData[0]?.fee));
 
           if (ahaFee && typeof ahaFee === 'number' && ahaFee > 0) {
             estimatedFee = Math.round(ahaFee);
             isRealAhamoveFee = true;
-            this.logger.log(`[AhaMove Estimate API] Giá cước ước tính thời gian thực từ AhaMove Portal: ${estimatedFee}đ`);
+            this.logger.log(
+              `[AhaMove Estimate API] Giá cước ước tính thời gian thực từ AhaMove Portal: ${estimatedFee}đ`,
+            );
           }
         }
       }
@@ -570,7 +665,12 @@ export class ShippingService {
     const R = 6371;
     const dLat = ((dropoff.lat - pickup.lat) * Math.PI) / 180;
     const dLon = ((dropoff.lng - pickup.lng) * Math.PI) / 180;
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos((pickup.lat * Math.PI) / 180) * Math.cos((dropoff.lat * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((pickup.lat * Math.PI) / 180) *
+        Math.cos((dropoff.lat * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distanceKm = Number((R * c).toFixed(2));
 
@@ -654,7 +754,9 @@ export class ShippingService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Không tìm thấy vận đơn AhaMove có mã ${code}`);
+      throw new NotFoundException(
+        `Không tìm thấy vận đơn AhaMove có mã ${code}`,
+      );
     }
 
     let currentStatus = (order.shippingStatus || 'ASSIGNING').toUpperCase();
@@ -662,11 +764,17 @@ export class ShippingService {
     let driverPhone = '0912 888 999';
 
     // Gọi trực tiếp AhaMove Staging API v3 để đồng bộ trạng thái thực tế nếu có mã vận đơn AhaMove thật
-    if (order.ahamoveOrderCode && !order.ahamoveOrderCode.startsWith('AHAMOVE-STG-')) {
+    if (
+      order.ahamoveOrderCode &&
+      !order.ahamoveOrderCode.startsWith('AHAMOVE-STG-')
+    ) {
       try {
-        const apiKey = process.env.AHAMOVE_API_KEY || 'sk_test_1oSlooJ79RRzEzAPV4xHQfEQEmuC0FYe';
+        const apiKey =
+          process.env.AHAMOVE_API_KEY ||
+          'sk_test_1oSlooJ79RRzEzAPV4xHQfEQEmuC0FYe';
         const mobile = process.env.AHAMOVE_MOBILE || '84869098696';
-        const baseUrl = process.env.AHAMOVE_API_URL || 'https://partner-apistg.ahamove.com';
+        const baseUrl =
+          process.env.AHAMOVE_API_URL || 'https://partner-apistg.ahamove.com';
 
         const tokenRes = await fetch(`${baseUrl}/v3/accounts/token`, {
           method: 'POST',
@@ -677,9 +785,12 @@ export class ShippingService {
         const token = tokenData?.token;
 
         if (token) {
-          const detailRes = await fetch(`${baseUrl}/v3/orders/${order.ahamoveOrderCode}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const detailRes = await fetch(
+            `${baseUrl}/v3/orders/${order.ahamoveOrderCode}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
 
           if (detailRes.ok) {
             const ahaData = await detailRes.json();
@@ -696,8 +807,20 @@ export class ShippingService {
               // Tự động cập nhật Database nếu trạng thái trên AhaMove Portal có thay đổi
               let targetOrderStatus: any = order.status;
               // Chỉ khi tài xế đã lấy hàng và đang di chuyển giao (IN_PROCESS, DELIVERING, ON_TRIP, PICKED...) mới chuyển sang SHIPPED (Đang giao)
-              const inDeliveringStatuses = ['IN_PROCESS', 'IN PROCESS', 'DELIVERING', 'ON_TRIP', 'TRIP_START', 'PICKED'];
-              const completedStatuses = ['COMPLETED', 'DELIVERED', 'SUCCESSFUL', 'FINISHED'];
+              const inDeliveringStatuses = [
+                'IN_PROCESS',
+                'IN PROCESS',
+                'DELIVERING',
+                'ON_TRIP',
+                'TRIP_START',
+                'PICKED',
+              ];
+              const completedStatuses = [
+                'COMPLETED',
+                'DELIVERED',
+                'SUCCESSFUL',
+                'FINISHED',
+              ];
               const cancelledStatuses = ['CANCELLED', 'FAILED', 'REJECTED'];
 
               if (completedStatuses.includes(ahaStatus)) {
@@ -708,7 +831,10 @@ export class ShippingService {
                 targetOrderStatus = 'CANCELLED';
               }
 
-              if (order.shippingStatus !== ahaStatus || order.status !== targetOrderStatus) {
+              if (
+                order.shippingStatus !== ahaStatus ||
+                order.status !== targetOrderStatus
+              ) {
                 await this.prisma.order.update({
                   where: { id: order.id },
                   data: {
@@ -723,12 +849,18 @@ export class ShippingService {
                   const payment = await this.prisma.payment.findUnique({
                     where: { orderId: order.id },
                   });
-                  if (payment && payment.method === 'COD' && payment.status !== 'PAID') {
+                  if (
+                    payment &&
+                    payment.method === 'COD' &&
+                    payment.status !== 'PAID'
+                  ) {
                     await this.prisma.payment.update({
                       where: { id: payment.id },
                       data: { status: 'PAID', paidAt: new Date() },
                     });
-                    this.logger.log(`[AhaMove Sync] Tự động cập nhật thanh toán COD thành PAID cho đơn ${order.id}`);
+                    this.logger.log(
+                      `[AhaMove Sync] Tự động cập nhật thanh toán COD thành PAID cho đơn ${order.id}`,
+                    );
                   }
                 }
               }
@@ -758,13 +890,18 @@ export class ShippingService {
         statusKey: 'ASSIGNING',
         title: 'Tìm tài xế',
         location: 'Hệ thống AhaMove Hà Nội',
-        description: 'Hệ thống AhaMove đang định vị và quét tài xế xe máy gần nhất',
+        description:
+          'Hệ thống AhaMove đang định vị và quét tài xế xe máy gần nhất',
         time: new Date(createdAt.getTime() + 15 * 1000),
         isCompleted: true,
       },
     ];
 
-    const isAccepted = currentStatus === 'ACCEPTED' || currentStatus === 'IN_PROCESS' || currentStatus === 'IN PROCESS' || currentStatus === 'COMPLETED';
+    const isAccepted =
+      currentStatus === 'ACCEPTED' ||
+      currentStatus === 'IN_PROCESS' ||
+      currentStatus === 'IN PROCESS' ||
+      currentStatus === 'COMPLETED';
 
     if (isAccepted) {
       trackingEvents.push({
@@ -778,7 +915,10 @@ export class ShippingService {
       });
     }
 
-    const isInProcess = currentStatus === 'IN_PROCESS' || currentStatus === 'IN PROCESS' || currentStatus === 'COMPLETED';
+    const isInProcess =
+      currentStatus === 'IN_PROCESS' ||
+      currentStatus === 'IN PROCESS' ||
+      currentStatus === 'COMPLETED';
 
     if (isInProcess) {
       trackingEvents.push({
@@ -786,13 +926,15 @@ export class ShippingService {
         statusKey: 'IN_PROCESS',
         title: 'Thực hiện',
         location: 'Tuyến đường giao hàng hỏa tốc',
-        description: 'Tài xế đã lấy hàng thành công và đang hỏa tốc vận chuyển tới khách',
+        description:
+          'Tài xế đã lấy hàng thành công và đang hỏa tốc vận chuyển tới khách',
         time: new Date(createdAt.getTime() + 120 * 1000),
         isCompleted: true,
       });
     }
 
-    const isCompleted = currentStatus === 'COMPLETED' || order.status === 'DELIVERED';
+    const isCompleted =
+      currentStatus === 'COMPLETED' || order.status === 'DELIVERED';
 
     if (isCompleted) {
       trackingEvents.push(
@@ -860,21 +1002,27 @@ export class ShippingService {
           const lat = Number(coords[1]);
 
           // Kiểm tra nghiêm ngặt khung tọa độ địa lý Hà Nội
-          const isStrictHanoiGPS = lat >= 20.53 && lat <= 21.39 && lng >= 105.28 && lng <= 106.02;
+          const isStrictHanoiGPS =
+            lat >= 20.53 && lat <= 21.39 && lng >= 105.28 && lng <= 106.02;
           if (!isStrictHanoiGPS) continue;
 
           const name = props.name || '';
           const street = props.street || props.name || '';
-          const houseNumber = props.housenumber ? `Số ${props.housenumber}, ` : '';
-          const district = props.district || props.suburb || props.city || 'Hà Nội';
+          const houseNumber = props.housenumber
+            ? `Số ${props.housenumber}, `
+            : '';
+          const district =
+            props.district || props.suburb || props.city || 'Hà Nội';
           const city = 'Thành phố Hà Nội';
 
           let fullAddress = '';
           if (houseNumber) fullAddress += houseNumber;
           if (street) fullAddress += street;
           if (name && name !== street) fullAddress += ` (${name})`;
-          if (district && !fullAddress.includes(district)) fullAddress += `, ${district}`;
-          if (!fullAddress.includes('Hà Nội')) fullAddress += ', Thành phố Hà Nội';
+          if (district && !fullAddress.includes(district))
+            fullAddress += `, ${district}`;
+          if (!fullAddress.includes('Hà Nội'))
+            fullAddress += ', Thành phố Hà Nội';
 
           const cleanAddr = fullAddress.trim();
           if (cleanAddr && !seenAddresses.has(cleanAddr.toLowerCase())) {
@@ -910,7 +1058,8 @@ export class ShippingService {
               const lng = Number(item.lon);
 
               // Kiểm tra nghiêm ngặt khung tọa độ địa lý Hà Nội
-              const isStrictHanoiGPS = lat >= 20.53 && lat <= 21.39 && lng >= 105.28 && lng <= 106.02;
+              const isStrictHanoiGPS =
+                lat >= 20.53 && lat <= 21.39 && lng >= 105.28 && lng <= 106.02;
               if (!isStrictHanoiGPS) continue;
 
               const addrObj = item.address || {};
@@ -918,10 +1067,17 @@ export class ShippingService {
               const lowerAddr = cleanAddr.toLowerCase();
 
               // Loại bỏ các địa điểm ở TP.HCM / Sài Gòn / Tỉnh khác bị trùng từ khóa "Hà Nội" trong tên quán
-              const isOtherProvince = lowerAddr.includes('hồ chí minh') || lowerAddr.includes('sài gòn') || lowerAddr.includes('đà nẵng') || lowerAddr.includes('bình dương') || lowerAddr.includes('đồng nai');
+              const isOtherProvince =
+                lowerAddr.includes('hồ chí minh') ||
+                lowerAddr.includes('sài gòn') ||
+                lowerAddr.includes('đà nẵng') ||
+                lowerAddr.includes('bình dương') ||
+                lowerAddr.includes('đồng nai');
               if (isOtherProvince) continue;
 
-              const houseNum = addrObj.house_number ? `Số ${addrObj.house_number}, ` : '';
+              const houseNum = addrObj.house_number
+                ? `Số ${addrObj.house_number}, `
+                : '';
               const street = addrObj.road || addrObj.suburb || '';
 
               if (cleanAddr && !seenAddresses.has(cleanAddr.toLowerCase())) {
@@ -971,7 +1127,9 @@ export class ShippingService {
           await this.getAhamoveTrackingDetail(order.ahamoveOrderCode);
           updatedCount++;
         } catch (err: any) {
-          this.logger.warn(`[Sync AhaMove Error] Order ${order.id}: ${err.message}`);
+          this.logger.warn(
+            `[Sync AhaMove Error] Order ${order.id}: ${err.message}`,
+          );
         }
       }
     }

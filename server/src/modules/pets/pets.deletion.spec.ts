@@ -117,10 +117,7 @@ describe('PetsService deletion policy', () => {
 
     expect(tx.spaBooking.updateMany).toHaveBeenCalledWith({
       where: {
-        AND: [
-          { petId: 'pet-1' },
-          { status: SpaBookingStatus.COMPLETED },
-        ],
+        AND: [{ petId: 'pet-1' }, { status: SpaBookingStatus.COMPLETED }],
       },
       data: { petId: null },
     });

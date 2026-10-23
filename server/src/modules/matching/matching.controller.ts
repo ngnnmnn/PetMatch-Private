@@ -68,10 +68,7 @@ export class MatchingController {
     @Req() request: AuthenticatedRequest,
     @Param('femalePetId') femalePetId: string,
   ) {
-    return this.matchingService.resetPassedPets(
-      request.user.id,
-      femalePetId,
-    );
+    return this.matchingService.resetPassedPets(request.user.id, femalePetId);
   }
 
   @Post('requests')

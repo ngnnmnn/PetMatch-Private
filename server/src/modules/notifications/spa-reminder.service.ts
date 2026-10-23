@@ -51,10 +51,7 @@ export class SpaReminderService
           reminderSentAt: null,
           scheduledAt: { gt: now, lte: reminderUntil },
           status: {
-            in: [
-              SpaBookingStatus.PENDING,
-              SpaBookingStatus.CONFIRMED,
-            ],
+            in: [SpaBookingStatus.PENDING, SpaBookingStatus.CONFIRMED],
           },
         },
         select: {

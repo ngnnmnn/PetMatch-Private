@@ -87,7 +87,9 @@ describe('MatchingService chat', () => {
       },
       user: {
         findMany: jest.fn().mockResolvedValue([]),
-        findUnique: jest.fn().mockResolvedValue({ id: userId, blockedUserIds: [] }),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: userId, blockedUserIds: [] }),
         update: jest.fn().mockResolvedValue({ id: userId }),
       },
     };
@@ -107,7 +109,9 @@ describe('MatchingService chat', () => {
       message: { updateMany: jest.fn().mockResolvedValue({ count: 0 }) },
       user: {
         findMany: jest.fn().mockResolvedValue([]),
-        findUnique: jest.fn().mockResolvedValue({ id: userId, blockedUserIds: [] }),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: userId, blockedUserIds: [] }),
         update: jest.fn().mockResolvedValue({ id: userId }),
       },
     };
@@ -156,7 +160,9 @@ describe('MatchingService chat', () => {
   });
 
   it('does not save a message when either user has blocked the other', async () => {
-    transaction.user.findMany.mockResolvedValue([{ id: userId, blockedUserIds: ['user-2'] }]);
+    transaction.user.findMany.mockResolvedValue([
+      { id: userId, blockedUserIds: ['user-2'] },
+    ]);
 
     await expect(
       service.sendMessage(userId, matchId, 'hello'),
@@ -423,7 +429,9 @@ describe('MatchingService pet eligibility', () => {
         findMany: jest.fn().mockResolvedValue([]),
       },
       user: {
-        findUnique: jest.fn().mockResolvedValue({ id: activeFemale.ownerId, blockedUserIds: [] }),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: activeFemale.ownerId, blockedUserIds: [] }),
         findMany: jest.fn().mockResolvedValue([]),
       },
       matchingRequest: { findMany: jest.fn().mockResolvedValue([]) },
@@ -459,7 +467,9 @@ describe('MatchingService pet eligibility', () => {
         findMany: jest.fn().mockResolvedValue([]),
       },
       user: {
-        findUnique: jest.fn().mockResolvedValue({ id: activeFemale.ownerId, blockedUserIds: [] }),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: activeFemale.ownerId, blockedUserIds: [] }),
         findMany: jest.fn().mockResolvedValue([]),
       },
       matchingRequest: { findMany: jest.fn().mockResolvedValue([]) },
@@ -551,15 +561,19 @@ describe('MatchingService pet eligibility', () => {
         findMany: jest.fn().mockResolvedValue([]),
       },
       user: {
-        findUnique: jest.fn().mockResolvedValue({ id: activeFemale.ownerId, blockedUserIds: [] }),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: activeFemale.ownerId, blockedUserIds: [] }),
         findMany: jest.fn().mockResolvedValue([]),
       },
       matchingRequest: { findMany: jest.fn().mockResolvedValue([]) },
       match: { findMany: jest.fn().mockResolvedValue([]) },
       breedRule: {
-        findMany: jest.fn().mockResolvedValue([
-          { breedA: 'Poodle', breedB: 'Chihuahua', isBlocked: true },
-        ]),
+        findMany: jest
+          .fn()
+          .mockResolvedValue([
+            { breedA: 'Poodle', breedB: 'Chihuahua', isBlocked: true },
+          ]),
       },
     };
     const service = new MatchingService(
@@ -664,7 +678,9 @@ describe('MatchingService moderation', () => {
         }),
       },
       user: {
-        findUnique: jest.fn().mockResolvedValue({ id: userId, blockedUserIds: [] }),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: userId, blockedUserIds: [] }),
         findMany: jest.fn().mockResolvedValue([]),
         update: jest.fn().mockResolvedValue({ id: userId }),
       },
@@ -682,9 +698,9 @@ describe('MatchingService moderation', () => {
       create: jest.fn().mockResolvedValue({ id: 'notification-1' }),
     };
     cloudinary = {
-      uploadBuffer: jest
-        .fn()
-        .mockResolvedValue({ url: 'https://res.cloudinary.com/demo/evidence.jpg' }),
+      uploadBuffer: jest.fn().mockResolvedValue({
+        url: 'https://res.cloudinary.com/demo/evidence.jpg',
+      }),
       destroyByUrl: jest.fn().mockResolvedValue(undefined),
     };
     service = new MatchingService(
@@ -867,7 +883,10 @@ describe('MatchingService moderation', () => {
     expect(tx.match.updateMany).toHaveBeenCalledTimes(1);
     expect(tx.auditLog.create).toHaveBeenCalledTimes(1);
 
-    tx.user.findUnique.mockResolvedValue({ id: userId, blockedUserIds: [otherUserId] });
+    tx.user.findUnique.mockResolvedValue({
+      id: userId,
+      blockedUserIds: [otherUserId],
+    });
     tx.user.update.mockClear();
     tx.matchingRequest.updateMany.mockClear();
     tx.match.updateMany.mockClear();
@@ -889,7 +908,10 @@ describe('MatchingService moderation', () => {
   });
 
   it('only removes a block created by the current user', async () => {
-    tx.user.findUnique.mockResolvedValue({ id: userId, blockedUserIds: [otherUserId] });
+    tx.user.findUnique.mockResolvedValue({
+      id: userId,
+      blockedUserIds: [otherUserId],
+    });
     await service.unblockUser(userId, otherUserId);
 
     expect(tx.$executeRaw).toHaveBeenCalledTimes(1);
@@ -954,7 +976,11 @@ describe('MatchingService resetPassedPets', () => {
   });
 
   it('rejects reset when user does not own the female pet', async () => {
-    const femalePet = { id: 'female-1', ownerId: 'other-user', gender: 'FEMALE' };
+    const femalePet = {
+      id: 'female-1',
+      ownerId: 'other-user',
+      gender: 'FEMALE',
+    };
     const prisma = {
       pet: {
         findUnique: jest.fn().mockResolvedValue(femalePet),
@@ -996,10 +1022,19 @@ describe('MatchingService compatibility scoring documents', () => {
   };
 
   it('does not give pedigree points for unverified self-declared pedigree', () => {
-    const female = { ...baseFemale, hasPedigree: true, pedigreeVerified: false };
+    const female = {
+      ...baseFemale,
+      hasPedigree: true,
+      pedigreeVerified: false,
+    };
     const male = { ...baseMale, hasPedigree: true, pedigreeVerified: false };
 
-    const result = (service as any).calculateCompatibilityScoreSync(female, male, [], 5);
+    const result = (service as any).calculateCompatibilityScoreSync(
+      female,
+      male,
+      [],
+      5,
+    );
     // Base(30) + SameBreed(25) + Location(15) + Weight(10) = 80
     expect(result.score).toBe(80);
     expect(result.reasons).not.toContain('both_pedigree');
@@ -1011,17 +1046,31 @@ describe('MatchingService compatibility scoring documents', () => {
     const female = { ...baseFemale, hasPedigree: true, pedigreeVerified: true };
     const male = { ...baseMale, hasPedigree: true, pedigreeVerified: true };
 
-    const result = (service as any).calculateCompatibilityScoreSync(female, male, [], 5);
+    const result = (service as any).calculateCompatibilityScoreSync(
+      female,
+      male,
+      [],
+      5,
+    );
     // Base(30) + SameBreed(25) + Location(15) + Weight(10) + BothPedigreeVerified(20) = 100
     expect(result.score).toBe(100);
     expect(result.reasons).toContain('both_pedigree_verified');
   });
 
   it('awards +10 points when only male pet has verified pedigree', () => {
-    const female = { ...baseFemale, hasPedigree: false, pedigreeVerified: false };
+    const female = {
+      ...baseFemale,
+      hasPedigree: false,
+      pedigreeVerified: false,
+    };
     const male = { ...baseMale, hasPedigree: true, pedigreeVerified: true };
 
-    const result = (service as any).calculateCompatibilityScoreSync(female, male, [], 5);
+    const result = (service as any).calculateCompatibilityScoreSync(
+      female,
+      male,
+      [],
+      5,
+    );
     // Base(30) + SameBreed(25) + Location(15) + Weight(10) + MalePedigreeVerified(10) = 90
     expect(result.score).toBe(90);
     expect(result.reasons).toContain('male_pedigree_verified');
@@ -1032,7 +1081,12 @@ describe('MatchingService compatibility scoring documents', () => {
     const female = { ...baseFemale, vaccineVerified: true };
     const male = { ...baseMale, vaccineVerified: true };
 
-    const result = (service as any).calculateCompatibilityScoreSync(female, male, [], 5);
+    const result = (service as any).calculateCompatibilityScoreSync(
+      female,
+      male,
+      [],
+      5,
+    );
     // Base(30) + SameBreed(25) + Location(15) + Weight(10) + BothVaccineVerified(5) = 85
     expect(result.score).toBe(85);
     expect(result.reasons).toContain('both_vaccine_verified');
@@ -1042,11 +1096,15 @@ describe('MatchingService compatibility scoring documents', () => {
     const female = { ...baseFemale, vaccineVerified: false };
     const male = { ...baseMale, vaccineVerified: true };
 
-    const result = (service as any).calculateCompatibilityScoreSync(female, male, [], 5);
+    const result = (service as any).calculateCompatibilityScoreSync(
+      female,
+      male,
+      [],
+      5,
+    );
     // Base(30) + SameBreed(25) + Location(15) + Weight(10) + MaleVaccineVerified(3) = 83
     expect(result.score).toBe(83);
     expect(result.reasons).toContain('male_vaccine_verified');
     expect(result.reasons).not.toContain('both_vaccine_verified');
   });
 });
-

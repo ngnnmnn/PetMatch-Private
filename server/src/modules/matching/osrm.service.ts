@@ -66,7 +66,9 @@ export class OsrmService {
       const data = await response.json();
 
       if (data?.code !== 'Ok' || !Array.isArray(data?.distances?.[0])) {
-        this.logger.warn(`OSRM Table API trả dữ liệu không hợp lệ: ${data?.code}`);
+        this.logger.warn(
+          `OSRM Table API trả dữ liệu không hợp lệ: ${data?.code}`,
+        );
         return null;
       }
 
@@ -77,7 +79,11 @@ export class OsrmService {
       // row[i + 1] là khoảng cách từ origin đến cappedDestinations[i]
       for (let i = 0; i < cappedDestinations.length; i++) {
         const distMeters = row[i + 1];
-        if (distMeters != null && typeof distMeters === 'number' && distMeters >= 0) {
+        if (
+          distMeters != null &&
+          typeof distMeters === 'number' &&
+          distMeters >= 0
+        ) {
           // Quy đổi từ mét sang kilômét và làm tròn 1 chữ số thập phân
           const distKm = Math.round((distMeters / 1000) * 10) / 10;
           resultMap.set(i, distKm);
@@ -87,9 +93,13 @@ export class OsrmService {
       return resultMap;
     } catch (error: any) {
       if (error?.name === 'AbortError') {
-        this.logger.warn(`OSRM Table API bị timeout sau ${this.TIMEOUT_MS}ms, chuyển sang fallback Haversine.`);
+        this.logger.warn(
+          `OSRM Table API bị timeout sau ${this.TIMEOUT_MS}ms, chuyển sang fallback Haversine.`,
+        );
       } else {
-        this.logger.warn(`Lỗi khi gọi OSRM Table API: ${error?.message || error}`);
+        this.logger.warn(
+          `Lỗi khi gọi OSRM Table API: ${error?.message || error}`,
+        );
       }
       return null;
     }

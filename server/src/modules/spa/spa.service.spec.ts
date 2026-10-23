@@ -170,14 +170,24 @@ describe('SpaService getAvailability and slot deduction', () => {
         userId: 'user-staff-1',
         addressSpaId: 'branch-1',
         status: 'ACTIVE',
-        user: { id: 'user-staff-1', name: 'Nhân viên 1', email: 'staff1@spa.local', avatarUrl: null },
+        user: {
+          id: 'user-staff-1',
+          name: 'Nhân viên 1',
+          email: 'staff1@spa.local',
+          avatarUrl: null,
+        },
       },
       {
         id: 'staff-rec-2',
         userId: 'user-staff-2',
         addressSpaId: 'branch-1',
         status: 'ACTIVE',
-        user: { id: 'user-staff-2', name: 'Nhân viên 2', email: 'staff2@spa.local', avatarUrl: null },
+        user: {
+          id: 'user-staff-2',
+          name: 'Nhân viên 2',
+          email: 'staff2@spa.local',
+          avatarUrl: null,
+        },
       },
     ];
 
@@ -336,7 +346,12 @@ describe('SpaService getAvailability and slot deduction', () => {
       },
       spaStaff: {
         findMany: jest.fn().mockResolvedValue([
-          { id: 'staff-1', userId: 'user-staff-1', addressSpaId: 'branch-1', status: 'ACTIVE' },
+          {
+            id: 'staff-1',
+            userId: 'user-staff-1',
+            addressSpaId: 'branch-1',
+            status: 'ACTIVE',
+          },
         ]),
       },
       spaBooking: {
@@ -381,13 +396,21 @@ describe('SpaService getAvailability and slot deduction', () => {
             userId: 'user-staff-1',
             addressSpaId: 'branch-1',
             status: 'ACTIVE',
-            user: { id: 'user-staff-1', name: 'Nhân viên 1', email: 's1@spa.local', avatarUrl: null },
+            user: {
+              id: 'user-staff-1',
+              name: 'Nhân viên 1',
+              email: 's1@spa.local',
+              avatarUrl: null,
+            },
           },
         ]),
       },
       spaBooking: {
         findMany: jest.fn().mockImplementation(({ where }) => {
-          if (where.petId === 'pet-1' || (where.OR && where.OR.some((c: any) => c.petId === 'pet-1'))) {
+          if (
+            where.petId === 'pet-1' ||
+            (where.OR && where.OR.some((c: any) => c.petId === 'pet-1'))
+          ) {
             return Promise.resolve(activePetBookings);
           }
           return Promise.resolve([]);
@@ -404,7 +427,12 @@ describe('SpaService getAvailability and slot deduction', () => {
       value: jest.fn(),
     });
 
-    const slots = await service.getAvailability('branch-1', '2026-08-20', 60, 'pet-1');
+    const slots = await service.getAvailability(
+      'branch-1',
+      '2026-08-20',
+      60,
+      'pet-1',
+    );
     const slot0900 = slots.find((s) => s.time === '09:00');
     const slot1000 = slots.find((s) => s.time === '10:00');
     const slot1130 = slots.find((s) => s.time === '11:30');
@@ -421,8 +449,6 @@ describe('SpaService getAvailability and slot deduction', () => {
     expect(slot1200?.isAvailable).toBe(true);
   });
 });
-
-
 
 describe('SpaService updateStaffBooking', () => {
   /**
@@ -581,7 +607,9 @@ describe('SpaService staff checkin date restriction & notify late', () => {
       {} as any,
     );
 
-    await expect(service.staffCheckIn('staff-1', 'booking-future')).rejects.toThrow(
+    await expect(
+      service.staffCheckIn('staff-1', 'booking-future'),
+    ).rejects.toThrow(
       'Chưa đến ngày hẹn. Chỉ được phép check-in cho thú cưng vào đúng ngày hẹn hoặc sau đó.',
     );
   });
@@ -619,7 +647,10 @@ describe('SpaService staff checkin date restriction & notify late', () => {
       notifications as any,
     );
 
-    const result = await service.staffNotifyManagerLate('staff-1', 'booking-late-1');
+    const result = await service.staffNotifyManagerLate(
+      'staff-1',
+      'booking-late-1',
+    );
     expect(result.success).toBe(true);
     expect(result.status).toBe('CONFIRMED');
     expect(createNotificationMock).toHaveBeenCalledWith(
@@ -641,9 +672,11 @@ describe('SpaService auto update overdue past bookings', () => {
 
     const prisma = {
       spaBooking: {
-        findMany: jest.fn()
+        findMany: jest
+          .fn()
           .mockResolvedValueOnce([]) // noShow
-          .mockResolvedValueOnce([   // past overdue
+          .mockResolvedValueOnce([
+            // past overdue
             {
               id: 'booking-past-1',
               scheduledAt: pastDate,
@@ -703,10 +736,7 @@ describe('SpaService auto update overdue past bookings', () => {
       expect.objectContaining({
         where: expect.objectContaining({
           status: {
-            in: [
-              SpaBookingStatus.CHECK_IN,
-              SpaBookingStatus.IN_PROGRESS,
-            ],
+            in: [SpaBookingStatus.CHECK_IN, SpaBookingStatus.IN_PROGRESS],
           },
         }),
         orderBy: { scheduledAt: 'asc' },
@@ -731,9 +761,11 @@ describe('SpaService auto update overdue past bookings', () => {
           }),
       );
     const runScheduled = () =>
-      (service as unknown as {
-        runScheduledBookingStatusUpdate: () => Promise<void>;
-      }).runScheduledBookingStatusUpdate();
+      (
+        service as unknown as {
+          runScheduledBookingStatusUpdate: () => Promise<void>;
+        }
+      ).runScheduledBookingStatusUpdate();
 
     const firstRun = runScheduled();
     await Promise.resolve();

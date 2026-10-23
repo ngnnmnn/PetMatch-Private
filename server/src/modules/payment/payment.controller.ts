@@ -106,7 +106,10 @@ export class PaymentController {
         `Payment ${payment.id} (code: ${orderCode}) marked as PAID via webhook.`,
       );
     } else if (isCancelled) {
-      await this.paymentService.markCancelledByOrderCode(orderCode, 'CANCELLED');
+      await this.paymentService.markCancelledByOrderCode(
+        orderCode,
+        'CANCELLED',
+      );
       console.log(
         `Payment ${payment.id} (code: ${orderCode}) marked as CANCELLED via webhook.`,
       );

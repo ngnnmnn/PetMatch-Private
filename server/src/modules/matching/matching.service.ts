@@ -117,7 +117,11 @@ export class MatchingService {
 
   async getCandidates(userId: string, dto: GetCandidatesDto) {
     // Cho phép xem trước danh sách ứng viên (Preview Mode) kể cả khi thú cưng cái chưa đủ tuổi
-    const femalePet = await this.getOwnedFemalePet(userId, dto.femalePetId, true);
+    const femalePet = await this.getOwnedFemalePet(
+      userId,
+      dto.femalePetId,
+      true,
+    );
     const blockedUserIds = await this.getBlockedUserIds(userId);
 
     // --- Hard constraint: tuổi tối thiểu cho query ---
@@ -169,10 +173,7 @@ export class MatchingService {
         species: femalePet.species,
         isActive: true,
         isBlocked: true,
-        OR: [
-          { breedA: femalePet.breed },
-          { breedB: femalePet.breed },
-        ],
+        OR: [{ breedA: femalePet.breed }, { breedB: femalePet.breed }],
       },
       select: { breedA: true, breedB: true },
     });
@@ -421,7 +422,8 @@ export class MatchingService {
 
     // Sắp xếp ưu tiên: Điểm tương thích cao nhất lên đầu, nếu bằng điểm thì ưu tiên khoảng cách gần hơn
     data.sort((a, b) => {
-      const scoreDiff = (b.compatibilityScore ?? 0) - (a.compatibilityScore ?? 0);
+      const scoreDiff =
+        (b.compatibilityScore ?? 0) - (a.compatibilityScore ?? 0);
       if (scoreDiff !== 0) return scoreDiff;
       return (a.distanceKm ?? 999) - (b.distanceKm ?? 999);
     });
@@ -445,7 +447,11 @@ export class MatchingService {
 
   async passPet(userId: string, dto: PassPetDto) {
     // Cho phép bỏ qua (pass) ứng viên ngay cả trong chế độ xem trước
-    const femalePet = await this.getOwnedFemalePet(userId, dto.femalePetId, true);
+    const femalePet = await this.getOwnedFemalePet(
+      userId,
+      dto.femalePetId,
+      true,
+    );
     const malePet = await this.getMaleCandidate(dto.malePetId);
     this.ensureDifferentOwners(femalePet, malePet);
     const request = await this.prisma.$transaction(async (tx) => {
@@ -469,7 +475,9 @@ export class MatchingService {
    * Giúp người dùng có thể xem lại các ứng viên khi đã lướt hết danh sách
    */
   async resetPassedPets(userId: string, femalePetId: string) {
-    const pet = await this.prisma.pet.findUnique({ where: { id: femalePetId } });
+    const pet = await this.prisma.pet.findUnique({
+      where: { id: femalePetId },
+    });
     if (!pet) {
       throw new NotFoundException('Female pet not found.');
     }
@@ -769,11 +777,18 @@ export class MatchingService {
     if (!request) {
       throw new NotFoundException('Không tìm thấy yêu cầu ghép đôi.');
     }
-    if (request.requesterId !== userId && request.femalePet.ownerId !== userId) {
-      throw new ForbiddenException('Bạn không có quyền hủy yêu cầu ghép đôi này.');
+    if (
+      request.requesterId !== userId &&
+      request.femalePet.ownerId !== userId
+    ) {
+      throw new ForbiddenException(
+        'Bạn không có quyền hủy yêu cầu ghép đôi này.',
+      );
     }
     if (request.status !== MatchingRequestStatus.PENDING) {
-      throw new BadRequestException('Chỉ có thể hủy yêu cầu đang ở trạng thái chờ phản hồi.');
+      throw new BadRequestException(
+        'Chỉ có thể hủy yêu cầu đang ở trạng thái chờ phản hồi.',
+      );
     }
 
     const cancelledRequest = await this.prisma.matchingRequest.update({
@@ -845,8 +860,7 @@ export class MatchingService {
             message.sender ?? ({ id: null, name: 'Tài khoản đã xóa' } as const),
         })),
         reportedTargetTypes: reports.map((report) => report.targetType),
-        blockedByMe:
-          Boolean(otherUserId && blockedIds.has(otherUserId)),
+        blockedByMe: Boolean(otherUserId && blockedIds.has(otherUserId)),
       };
     });
   }
@@ -1505,10 +1519,12 @@ export class MatchingService {
       throw new BadRequestException('Only active pets can join matching.');
     }
 
-    // Ràng buộc cứng: tuổi tối thiểu và cân nặng chuẩn (chỉ kiểm tra khi không ở chế độ xem trước)
+    // Ràng buộc cứng: Cân nặng chuẩn phải luôn thỏa mãn điều kiện phối giống an toàn
+    this.assertMatchingWeight(pet);
+
+    // Tuổi tối thiểu chỉ kiểm tra khi không ở chế độ xem trước (Preview Mode)
     if (!allowUnderage) {
       this.assertMinimumAge(pet);
-      this.assertMatchingWeight(pet);
     }
 
     return pet;
@@ -1763,7 +1779,13 @@ export class MatchingService {
       femalePet.breed,
       malePet.breed,
     );
-    return this.applyBreedRuleScore(score, reasons, warnings, breedRule, isSameBreed);
+    return this.applyBreedRuleScore(
+      score,
+      reasons,
+      warnings,
+      breedRule,
+      isSameBreed,
+    );
   }
 
   private calculateCompatibilityScoreSync(
@@ -1816,7 +1838,13 @@ export class MatchingService {
           (r.breedA === malePet.breed && r.breedB === femalePet.breed),
       ) || null;
 
-    return this.applyBreedRuleScore(score, reasons, warnings, breedRule, isSameBreed);
+    return this.applyBreedRuleScore(
+      score,
+      reasons,
+      warnings,
+      breedRule,
+      isSameBreed,
+    );
   }
 
   private applyBreedRuleScore(

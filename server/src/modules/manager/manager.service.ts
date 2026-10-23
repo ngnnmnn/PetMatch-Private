@@ -63,45 +63,40 @@ export class ManagerService {
 
   async getActivitySnapshot() {
     const storeId = await this.getConfiguredStoreId();
-    const [
-      recentOrders,
-      orderState,
-      paymentState,
-      productState,
-      variantState,
-    ] = await Promise.all([
-      this.prisma.order.findMany({
-        where: {
-          storeId,
-          NOT: {
-            payment: { is: { method: 'QR', status: 'PENDING' } },
+    const [recentOrders, orderState, paymentState, productState, variantState] =
+      await Promise.all([
+        this.prisma.order.findMany({
+          where: {
+            storeId,
+            NOT: {
+              payment: { is: { method: 'QR', status: 'PENDING' } },
+            },
           },
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 100,
-        select: { id: true },
-      }),
-      this.prisma.order.aggregate({
-        where: { storeId },
-        _count: { _all: true },
-        _max: { updatedAt: true },
-      }),
-      this.prisma.payment.aggregate({
-        where: { order: { storeId } },
-        _count: { _all: true },
-        _max: { updatedAt: true },
-      }),
-      this.prisma.product.aggregate({
-        where: { storeId },
-        _count: { _all: true },
-        _max: { updatedAt: true },
-      }),
-      this.prisma.productVariant.aggregate({
-        where: { product: { storeId } },
-        _count: { _all: true },
-        _max: { updatedAt: true },
-      }),
-    ]);
+          orderBy: { createdAt: 'desc' },
+          take: 100,
+          select: { id: true },
+        }),
+        this.prisma.order.aggregate({
+          where: { storeId },
+          _count: { _all: true },
+          _max: { updatedAt: true },
+        }),
+        this.prisma.payment.aggregate({
+          where: { order: { storeId } },
+          _count: { _all: true },
+          _max: { updatedAt: true },
+        }),
+        this.prisma.product.aggregate({
+          where: { storeId },
+          _count: { _all: true },
+          _max: { updatedAt: true },
+        }),
+        this.prisma.productVariant.aggregate({
+          where: { product: { storeId } },
+          _count: { _all: true },
+          _max: { updatedAt: true },
+        }),
+      ]);
 
     return {
       orderIds: recentOrders.map(({ id }) => id),

@@ -58,7 +58,9 @@ describe('UsersService order pricing', () => {
       $transaction: jest.fn((callback) => callback(tx)),
     };
     const shippingService = {
-      estimateAhamoveShippingFee: jest.fn().mockResolvedValue({ feeVnd: 30000 }),
+      estimateAhamoveShippingFee: jest
+        .fn()
+        .mockResolvedValue({ feeVnd: 30000 }),
     };
     const service = new UsersService(
       prisma as any,

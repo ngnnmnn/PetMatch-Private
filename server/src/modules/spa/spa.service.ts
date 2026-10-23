@@ -381,9 +381,7 @@ export class SpaService implements OnModuleInit, OnModuleDestroy {
     const firstService = mainService || subServices[0];
     const categoryId =
       dto.branchId ||
-      (firstService
-        ? firstService.categoryId || (firstService as any).brandId
-        : null);
+      (firstService ? firstService.categoryId || firstService.brandId : null);
     const bookingTime = new Date(dto.scheduledAt);
 
     if (isNaN(bookingTime.getTime())) {
@@ -739,7 +737,11 @@ export class SpaService implements OnModuleInit, OnModuleDestroy {
 
       // Giữ nguyên giá chốt ban đầu, nếu thiếu hoặc bằng 0 thì tính toán từ mốc dịch vụ và cân nặng thú cưng
       let mainPrice = b.priceSnapshot;
-      if (mainPrice === null || mainPrice === undefined || (mainPrice === 0 && b.service)) {
+      if (
+        mainPrice === null ||
+        mainPrice === undefined ||
+        (mainPrice === 0 && b.service)
+      ) {
         if (b.service) {
           mainPrice = resolveServicePriceAndDuration(
             b.service,
@@ -2088,8 +2090,7 @@ export class SpaService implements OnModuleInit, OnModuleDestroy {
         serviceName: b.service?.name || 'Khác',
         status: b.status,
         petName: b.petName || b.pet?.name || 'Thú cưng',
-        customerName:
-          b.customerNameSnapshot || b.user?.name || 'Khách hàng',
+        customerName: b.customerNameSnapshot || b.user?.name || 'Khách hàng',
         note: b.note,
         staffId: b.staffId,
         staffName: b.staff?.name || null,
@@ -2487,7 +2488,7 @@ export class SpaService implements OnModuleInit, OnModuleDestroy {
     ) as string[];
     const allSubServiceIds = Array.from(
       new Set(bookings.flatMap((b) => b.subServiceIds || [])),
-    ) as string[];
+    );
     const allServiceIds = Array.from(
       new Set([...allMainServiceIds, ...allSubServiceIds]),
     );

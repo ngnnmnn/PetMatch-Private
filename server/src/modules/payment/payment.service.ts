@@ -1,6 +1,14 @@
-import { Injectable, InternalServerErrorException, OnApplicationBootstrap } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { PayOS } from '@payos/node';
-import { NotificationCategory, NotificationEventType, PaymentStatus } from '@prisma/client';
+import {
+  NotificationCategory,
+  NotificationEventType,
+  PaymentStatus,
+} from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { ORDER_STATUS_LABELS } from '../notifications/notification-status-labels';
@@ -178,10 +186,10 @@ export class PaymentService implements OnApplicationBootstrap {
         payment.status === PaymentStatus.PAID
           ? payment
           : await tx.payment.update({
-            where: { id: payment.id },
-            data: { status: PaymentStatus.PAID, paidAt: new Date() },
-            include: { order: true, spaBooking: true },
-          });
+              where: { id: payment.id },
+              data: { status: PaymentStatus.PAID, paidAt: new Date() },
+              include: { order: true, spaBooking: true },
+            });
 
       // Cập nhật trạng thái thanh toán thành PAID, giữ nguyên order.status là PENDING (hoặc đưa về PENDING nếu trước đó bị PAYMENT_ERROR)
       // Giúp giao diện hiển thị nhãn 'Đã thanh toán' và Manager chủ động nhấn nút 'Xác nhận đơn'
@@ -210,16 +218,11 @@ export class PaymentService implements OnApplicationBootstrap {
         }
       }
 
-      if (
-        payment.spaBooking &&
-        payment.spaBooking.status !== 'COMPLETED'
-      ) {
+      if (payment.spaBooking && payment.spaBooking.status !== 'COMPLETED') {
         const timeEndReal = new Date();
         const expectedEnd =
           payment.spaBooking.timeEndExpected ||
-          new Date(
-            payment.spaBooking.scheduledAt.getTime() + 45 * 60 * 1000,
-          );
+          new Date(payment.spaBooking.scheduledAt.getTime() + 45 * 60 * 1000);
         const updatedBooking = await tx.spaBooking.update({
           where: { id: payment.spaBooking.id },
           data: {

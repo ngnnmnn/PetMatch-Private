@@ -102,14 +102,21 @@ export class AdminSpaBookingsService {
 
       const subServicesFromIds = booking.subServiceIds
         .map((id) => serviceById.get(id))
-        .filter((service): service is NonNullable<typeof service> => service !== undefined);
+        .filter(
+          (service): service is NonNullable<typeof service> =>
+            service !== undefined,
+        );
 
       const subServices =
         Array.isArray(booking.subServicesSnapshot) &&
         booking.subServicesSnapshot.length > 0
           ? (booking.subServicesSnapshot as any[])
           : subServicesFromIds.map((s) => {
-              const resolved = resolveServicePriceAndDuration(s, petSpecies, petWeight);
+              const resolved = resolveServicePriceAndDuration(
+                s,
+                petSpecies,
+                petWeight,
+              );
               return {
                 ...s,
                 price: resolved.price,
@@ -118,8 +125,15 @@ export class AdminSpaBookingsService {
             });
 
       let mainServiceResolved = resolvedMain;
-      if (mainServiceResolved && typeof (mainServiceResolved as any).price !== 'number') {
-        const resolved = resolveServicePriceAndDuration(mainServiceResolved, petSpecies, petWeight);
+      if (
+        mainServiceResolved &&
+        typeof (mainServiceResolved as any).price !== 'number'
+      ) {
+        const resolved = resolveServicePriceAndDuration(
+          mainServiceResolved,
+          petSpecies,
+          petWeight,
+        );
         mainServiceResolved = {
           ...mainServiceResolved,
           price: resolved.price,

@@ -73,9 +73,15 @@ export function getServiceBracketsForSpecies(
   if (is2D) {
     // Với ALL: mảng 0 là cho Chó, mảng 1 là cho Mèo
     const idx = targetSpecies === 'CAT' ? 1 : 0;
-    mins = Array.isArray(minWeightsRaw[idx]) ? minWeightsRaw[idx] : minWeightsRaw[0] || [];
-    maxs = Array.isArray(maxWeightsRaw[idx]) ? maxWeightsRaw[idx] : maxWeightsRaw[0] || [];
-    durs = Array.isArray(durationsRaw[idx]) ? durationsRaw[idx] : durationsRaw[0] || [];
+    mins = Array.isArray(minWeightsRaw[idx])
+      ? minWeightsRaw[idx]
+      : minWeightsRaw[0] || [];
+    maxs = Array.isArray(maxWeightsRaw[idx])
+      ? maxWeightsRaw[idx]
+      : maxWeightsRaw[0] || [];
+    durs = Array.isArray(durationsRaw[idx])
+      ? durationsRaw[idx]
+      : durationsRaw[0] || [];
     prcs = Array.isArray(pricesRaw[idx]) ? pricesRaw[idx] : pricesRaw[0] || [];
   } else {
     mins = Array.isArray(minWeightsRaw[0]) ? minWeightsRaw[0] : minWeightsRaw;
@@ -84,15 +90,31 @@ export function getServiceBracketsForSpecies(
     prcs = Array.isArray(pricesRaw[0]) ? pricesRaw[0] : pricesRaw;
   }
 
-  const length = Math.max(mins.length, maxs.length, durs.length, prcs.length, 1);
+  const length = Math.max(
+    mins.length,
+    maxs.length,
+    durs.length,
+    prcs.length,
+    1,
+  );
   const brackets: SpaWeightBracket[] = [];
 
   for (let i = 0; i < length; i++) {
     brackets.push({
       minWeight: typeof mins[i] === 'number' ? mins[i] : 0,
       maxWeight: typeof maxs[i] === 'number' ? maxs[i] : null,
-      duration: typeof durs[i] === 'number' ? durs[i] : (typeof durs[0] === 'number' ? durs[0] : 60),
-      price: typeof prcs[i] === 'number' ? prcs[i] : (typeof prcs[0] === 'number' ? prcs[0] : 0),
+      duration:
+        typeof durs[i] === 'number'
+          ? durs[i]
+          : typeof durs[0] === 'number'
+            ? durs[0]
+            : 60,
+      price:
+        typeof prcs[i] === 'number'
+          ? prcs[i]
+          : typeof prcs[0] === 'number'
+            ? prcs[0]
+            : 0,
     });
   }
 
@@ -123,7 +145,8 @@ export function resolveServicePriceAndDuration(
     };
   }
 
-  const weight = typeof petWeight === 'number' && !isNaN(petWeight) ? petWeight : 0;
+  const weight =
+    typeof petWeight === 'number' && !isNaN(petWeight) ? petWeight : 0;
 
   // Tìm mốc phù hợp
   for (let i = 0; i < brackets.length; i++) {
@@ -193,7 +216,9 @@ export function computeServiceDisplayRanges(service: any) {
   const minPrice = flatPrices.length ? Math.min(...flatPrices) : 0;
   const maxPrice = flatPrices.length ? Math.max(...flatPrices) : minPrice;
   const minDuration = flatDurations.length ? Math.min(...flatDurations) : 30;
-  const maxDuration = flatDurations.length ? Math.max(...flatDurations) : minDuration;
+  const maxDuration = flatDurations.length
+    ? Math.max(...flatDurations)
+    : minDuration;
 
   return {
     minPrice,

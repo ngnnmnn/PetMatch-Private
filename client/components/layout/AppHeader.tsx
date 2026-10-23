@@ -69,7 +69,7 @@ export default function AppHeader({ sectionLabel = 'Trang chủ' }: AppHeaderPro
   }
 
   return (
-    <nav aria-label={`Điều hướng ${sectionLabel}`} className="sticky top-0 z-40 border-b border-[var(--border-color)] bg-card/95 shadow-sm backdrop-blur">
+    <nav aria-label={`Điều hướng ${sectionLabel}`} className="sticky top-0 z-40 border-b border-[#ECE6DC] bg-[#FAF8F5]/92 shadow-2xs backdrop-blur-md">
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-6">
         {/* Brand Logo */}
         <Link

@@ -44,6 +44,7 @@ jobs:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/petmatching?schema=public"
           DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/petmatching?schema=public"
           JWT_SECRET: "ci-jwt-test-secret-key-1234567890"
+          TZ: "Asia/Ho_Chi_Minh"
         run: npm test
 
       - name: Biên dịch NestJS (Build)

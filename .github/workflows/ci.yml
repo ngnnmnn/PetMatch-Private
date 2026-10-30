@@ -113,15 +113,9 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # Khôi phục file .env nếu đã sao lưu, hoặc khôi phục từ commit de1840f
+            # Khôi phục file .env từ bản sao lưu tạm
             if [ -f /tmp/petmatch_server.env.bak ]; then
               cp /tmp/petmatch_server.env.bak server/.env
-            elif [ ! -f server/.env ]; then
-              echo "[PetMatching CD] Khôi phục server/.env từ lịch sử git gần nhất..."
-              git checkout de1840f -- server/.env 2>/dev/null || true
-              if [ -f server/.env ]; then
-                sed -i 's|FRONTEND_URL=.*|FRONTEND_URL="https://petmatch.io.vn"|g' server/.env
-              fi
             fi
 
             if [ ! -f server/.env ]; then

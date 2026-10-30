@@ -104,8 +104,30 @@ jobs:
             set -e
             echo "[PetMatching CD] Đang cập nhật mã nguồn mới nhất trên VPS..."
             cd /opt/petmatching
+
+            # Bảo vệ file cấu hình môi trường .env không bị xóa khi git reset
+            if [ -f server/.env ]; then
+              cp server/.env /tmp/petmatch_server.env.bak
+            fi
+
             git fetch origin main
             git reset --hard origin/main
+
+            # Khôi phục file .env nếu đã sao lưu, hoặc khôi phục từ commit de1840f
+            if [ -f /tmp/petmatch_server.env.bak ]; then
+              cp /tmp/petmatch_server.env.bak server/.env
+            elif [ ! -f server/.env ]; then
+              echo "[PetMatching CD] Khôi phục server/.env từ lịch sử git gần nhất..."
+              git checkout de1840f -- server/.env 2>/dev/null || true
+              if [ -f server/.env ]; then
+                sed -i 's|FRONTEND_URL=.*|FRONTEND_URL="https://petmatch.io.vn"|g' server/.env
+              fi
+            fi
+
+            if [ ! -f server/.env ]; then
+              echo "LỖI: Không tìm thấy server/.env trên VPS!"
+              exit 1
+            fi
 
             echo "[PetMatching CD] Rebuild và cập nhật Docker containers..."
             docker compose -f docker-compose.prod.yml up -d --build --remove-orphans

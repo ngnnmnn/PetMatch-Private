@@ -13,13 +13,13 @@ yarn-error.log*
 # Testing
 coverage/
 
-# Env (cho phep commit .env va .env.local tren private repo)
+# Environment files
+.env
+.env.*
+!.env.example
+db.env
 *.msi
 **/scratch/
-.env*
-!.env
-!.env.local
-db.env
 
 # Build outputs
 dist/

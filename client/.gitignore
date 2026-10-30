@@ -30,10 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (cho phep commit .env va .env.local tren private repo)
-.env*
-!.env
-!.env.local
+# env files
+.env
+.env.*
+!.env.example
 
 # vercel
 .vercel

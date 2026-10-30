@@ -20,28 +20,35 @@ async function bootstrap() {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+  // Cấu hình danh sách Origins được phép kết nối qua CORS
   const allowedOrigins = [
     process.env.CLIENT_URL,
     process.env.FRONTEND_URL,
+    'https://petmatch.io.vn',
+    'http://petmatch.io.vn',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://localhost:3001',
     'http://127.0.0.1:3001',
-  ].filter(Boolean);
+  ].filter(Boolean) as string[];
 
   app.enableCors({
     origin: (
       origin: string | undefined,
       callback: (error: Error | null, allow?: boolean) => void,
     ) => {
-      // Allow if no origin (e.g. server-to-server) or matched in array
+      // Cho phép nếu không có origin (server-to-server, curl, mobile app) hoặc nằm trong danh sách cho phép
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
         return;
       }
 
-      // Allow any vercel.app subdomains for preview environments
-      if (origin.endsWith('.vercel.app')) {
+      // Cho phép mọi subdomain của petmatch.io.vn hoặc các preview deployment của vercel.app
+      if (
+        origin.endsWith('.petmatch.io.vn') ||
+        origin === 'https://petmatch.io.vn' ||
+        origin.endsWith('.vercel.app')
+      ) {
         callback(null, true);
         return;
       }

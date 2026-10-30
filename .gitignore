@@ -13,11 +13,12 @@ yarn-error.log*
 # Testing
 coverage/
 
-# Environment files
+# Environment files & Private Handover
 .env
 .env.*
 !.env.example
 db.env
+HANDOVER.md
 *.msi
 **/scratch/
 

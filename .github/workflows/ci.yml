@@ -90,39 +90,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     steps:
-      - name: Triển khai lên VPS qua SSH bằng Password
-        if: "${{ secrets.VPS_PASSWORD != '' }}"
+      - name: Triển khai lên VPS qua SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
-          port: ${{ secrets.VPS_PORT || 22 }}
-          script_stop: true
-          script: |
-            set -e
-            echo "[PetMatching CD] Đang cập nhật mã nguồn mới nhất trên VPS..."
-            cd /opt/petmatching
-            git fetch origin main
-            git reset --hard origin/main
-
-            echo "[PetMatching CD] Rebuild và cập nhật Docker containers..."
-            docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
-
-            echo "[PetMatching CD] Thu hồi Docker images cũ không sử dụng..."
-            docker image prune -f
-
-            echo "[PetMatching CD] Kiểm tra trạng thái containers sau triển khai..."
-            docker compose -f docker-compose.prod.yml ps
-
-            echo "[PetMatching CD] Triển khai thành công!"
-
-      - name: Triển khai lên VPS qua SSH bằng SSH Key
-        if: "${{ secrets.VPS_PASSWORD == '' && secrets.VPS_SSH_KEY != '' }}"
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
           script_stop: true

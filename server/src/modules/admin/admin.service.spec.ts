@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import {
   AccountStatus,
   ComplaintAction,
@@ -42,9 +38,7 @@ describe('AdminService matching reports', () => {
     tx = {
       $queryRaw: jest.fn().mockResolvedValue([]),
       petReport: {
-        findUnique: jest
-          .fn()
-          .mockImplementation(() => Promise.resolve(openReport())),
+        findUnique: jest.fn().mockImplementation(() => Promise.resolve(openReport())),
         count: jest.fn().mockResolvedValue(0),
         update: jest.fn().mockResolvedValue({
           id: 'report-1',
@@ -65,38 +59,19 @@ describe('AdminService matching reports', () => {
       },
     };
     prisma = {
-      petReport: {
-        findUnique: jest.fn(),
-        count: jest.fn().mockResolvedValue(0),
-      },
+      petReport: { findUnique: jest.fn(), count: jest.fn().mockResolvedValue(0) },
       message: { findMany: jest.fn() },
       auditLog: { findFirst: jest.fn().mockResolvedValue(null) },
-      $transaction: jest
-        .fn()
-        .mockImplementation((callback: (client: any) => unknown) =>
-          callback(tx),
-        ),
+      $transaction: jest.fn().mockImplementation((callback: (client: any) => unknown) => callback(tx)),
     };
-    notifications.create
-      .mockReset()
-      .mockResolvedValue({ id: 'notification-1' });
+    notifications.create.mockReset().mockResolvedValue({ id: 'notification-1' });
     cloudinary.destroyByUrl.mockReset().mockResolvedValue(undefined);
-    service = new AdminService(
-      prisma as PrismaService,
-      notifications as any,
-      cloudinary as any,
-    );
+    service = new AdminService(prisma as PrismaService, notifications as any, cloudinary as any);
   });
 
   it('returns report context with messages ordered from oldest to newest', async () => {
-    const newer = {
-      id: 'message-2',
-      createdAt: new Date('2026-08-08T02:00:00Z'),
-    };
-    const older = {
-      id: 'message-1',
-      createdAt: new Date('2026-08-08T01:00:00Z'),
-    };
+    const newer = { id: 'message-2', createdAt: new Date('2026-08-08T02:00:00Z') };
+    const older = { id: 'message-1', createdAt: new Date('2026-08-08T01:00:00Z') };
     prisma.petReport.findUnique.mockResolvedValue({
       id: 'report-1',
       targetType: 'USER',
@@ -111,28 +86,24 @@ describe('AdminService matching reports', () => {
     const report = await service.getMatchingReport('report-1');
 
     expect(report.match?.messages).toEqual([older, newer]);
-    expect(prisma.petReport.findUnique).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: 'report-1' },
-        include: expect.any(Object),
-      }),
-    );
-    expect(prisma.message.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: {
-          matchId: 'match-1',
-          createdAt: { lte: reportCreatedAt },
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 30,
-      }),
-    );
+    expect(prisma.petReport.findUnique).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'report-1' },
+      include: expect.any(Object),
+    }));
+    expect(prisma.message.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: {
+        matchId: 'match-1',
+        createdAt: { lte: reportCreatedAt },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 30,
+    }));
     expect(report.resolutionMessageTemplates.RESOLVED.WARNING).toContain(
       'đã được xác minh',
     );
-    expect(
-      report.resolutionMessageTemplates.RESOLVED.SUSPEND_ACCOUNT,
-    ).toContain('tạm khóa tài khoản');
+    expect(report.resolutionMessageTemplates.RESOLVED.SUSPEND_ACCOUNT).toContain(
+      'tạm khóa tài khoản',
+    );
     expect(report.resolutionMessageTemplates.RESOLVED.HIDE_CONTENT).toContain(
       'ngừng khả năng tham gia ghép đôi',
     );
@@ -141,9 +112,7 @@ describe('AdminService matching reports', () => {
 
   it('rejects a missing report', async () => {
     prisma.petReport.findUnique.mockResolvedValue(null);
-    await expect(service.getMatchingReport('missing')).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(service.getMatchingReport('missing')).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('marks a pending report as under review by the current admin', async () => {
@@ -176,25 +145,19 @@ describe('AdminService matching reports', () => {
       resolutionMessage: `  ${resolutionMessage}  `,
     });
 
-    expect(tx.petReport.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: 'report-1' },
-        data: expect.objectContaining({
-          status: ComplaintStatus.RESOLVED,
-          actionTaken: ComplaintAction.WARNING,
-          adminNote: 'Đã kiểm tra nội dung cuộc trò chuyện.',
-          resolutionMessage,
-          resolvedById: 'admin-1',
-        }),
+    expect(tx.petReport.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'report-1' },
+      data: expect.objectContaining({
+        status: ComplaintStatus.RESOLVED,
+        actionTaken: ComplaintAction.WARNING,
+        adminNote: 'Đã kiểm tra nội dung cuộc trò chuyện.',
+        resolutionMessage,
+        resolvedById: 'admin-1',
       }),
-    );
-    expect(tx.auditLog.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          action: 'ADMIN_RESOLVE_MATCHING_REPORT',
-        }),
-      }),
-    );
+    }));
+    expect(tx.auditLog.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ action: 'ADMIN_RESOLVE_MATCHING_REPORT' }),
+    }));
     expect(notifications.create).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: 'reporter-1',
@@ -289,30 +252,24 @@ describe('AdminService matching reports', () => {
       { imageUrls: ['https://res.cloudinary.com/demo/image/upload/old.jpg'] },
     ]);
 
-    await service.resolveMatchingReport(
-      { id: 'admin-1', name: 'Admin' },
-      'report-1',
-      {
-        status: ComplaintStatus.INSUFFICIENT_EVIDENCE,
-        action: ComplaintAction.RESOLVE,
-        adminNote: 'Cần xác minh lại giấy tờ.',
-        resolutionMessage: 'Chủ sở hữu đã được yêu cầu tải lại giấy tờ.',
-        documentTypes: [DocumentType.VACCINE_RECORD],
-      },
-    );
+    await service.resolveMatchingReport({ id: 'admin-1', name: 'Admin' }, 'report-1', {
+      status: ComplaintStatus.INSUFFICIENT_EVIDENCE,
+      action: ComplaintAction.RESOLVE,
+      adminNote: 'Cần xác minh lại giấy tờ.',
+      resolutionMessage: 'Chủ sở hữu đã được yêu cầu tải lại giấy tờ.',
+      documentTypes: [DocumentType.VACCINE_RECORD],
+    });
 
     expect(tx.petDocument.deleteMany).toHaveBeenCalledWith({
       where: { petId: 'pet-1', type: { in: [DocumentType.VACCINE_RECORD] } },
     });
     expect(tx.petDocument.createMany).toHaveBeenCalledWith({
-      data: [
-        expect.objectContaining({
-          petId: 'pet-1',
-          type: DocumentType.VACCINE_RECORD,
-          imageUrls: [],
-          status: DocumentStatus.NEED_MORE_INFO,
-        }),
-      ],
+      data: [expect.objectContaining({
+        petId: 'pet-1',
+        type: DocumentType.VACCINE_RECORD,
+        imageUrls: [],
+        status: DocumentStatus.NEED_MORE_INFO,
+      })],
     });
     expect(tx.pet.update).toHaveBeenCalledWith({
       where: { id: 'pet-1' },
@@ -359,7 +316,9 @@ describe('AdminService matching reports', () => {
         accountStatus: 'ACTIVE',
       },
     });
-    tx.petReport.count.mockResolvedValueOnce(3).mockResolvedValueOnce(3);
+    tx.petReport.count
+      .mockResolvedValueOnce(3)
+      .mockResolvedValueOnce(3);
 
     await service.moderateMatchingReportReporter(
       { id: 'admin-1' },
@@ -392,7 +351,9 @@ describe('AdminService matching reports', () => {
         accountStatus: 'ACTIVE',
       },
     });
-    tx.petReport.count.mockResolvedValueOnce(1).mockResolvedValueOnce(5);
+    tx.petReport.count
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(5);
 
     await service.moderateMatchingReportReporter(
       { id: 'admin-1' },
@@ -427,9 +388,11 @@ describe('AdminService matching reports', () => {
     tx.petReport.count.mockResolvedValue(0);
 
     await expect(
-      service.moderateMatchingReportReporter({ id: 'admin-1' }, 'report-1', {
-        action: 'WARNING',
-      }),
+      service.moderateMatchingReportReporter(
+        { id: 'admin-1' },
+        'report-1',
+        { action: 'WARNING' },
+      ),
     ).rejects.toBeInstanceOf(BadRequestException);
     expect(notifications.create).not.toHaveBeenCalled();
   });
@@ -545,14 +508,8 @@ describe('AdminService pet document review', () => {
       pet: { update: jest.fn().mockResolvedValue({ id: 'pet-1' }) },
       auditLog: { create: jest.fn().mockResolvedValue({ id: 'audit-1' }) },
     };
-    notifications.create
-      .mockReset()
-      .mockResolvedValue({ id: 'notification-1' });
-    service = new AdminService(
-      prisma as PrismaService,
-      notifications as any,
-      cloudinary as any,
-    );
+    notifications.create.mockReset().mockResolvedValue({ id: 'notification-1' });
+    service = new AdminService(prisma as PrismaService, notifications as any, cloudinary as any);
   });
 
   it.each([DocumentStatus.REJECTED, DocumentStatus.NEED_MORE_INFO])(
@@ -576,26 +533,20 @@ describe('AdminService pet document review', () => {
       { status: DocumentStatus.REJECTED, reviewNote: '  Ảnh giấy tờ bị mờ.  ' },
     );
 
-    expect(prisma.petDocument.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: 'document-1' },
-        data: expect.objectContaining({
-          status: DocumentStatus.REJECTED,
-          reviewNote: 'Ảnh giấy tờ bị mờ.',
-          reviewerId: 'admin-1',
-        }),
+    expect(prisma.petDocument.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 'document-1' },
+      data: expect.objectContaining({
+        status: DocumentStatus.REJECTED,
+        reviewNote: 'Ảnh giấy tờ bị mờ.',
+        reviewerId: 'admin-1',
       }),
-    );
-    expect(prisma.auditLog.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          action: 'ADMIN_REVIEW_PET_DOCUMENT',
-          metadata: expect.objectContaining({
-            reviewNote: 'Ảnh giấy tờ bị mờ.',
-          }),
-        }),
+    }));
+    expect(prisma.auditLog.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        action: 'ADMIN_REVIEW_PET_DOCUMENT',
+        metadata: expect.objectContaining({ reviewNote: 'Ảnh giấy tờ bị mờ.' }),
       }),
-    );
+    }));
     expect(notifications.create).toHaveBeenCalledWith(
       expect.objectContaining({ userId: 'owner-1', entityId: 'document-1' }),
     );
@@ -622,35 +573,28 @@ describe('AdminService pet document review', () => {
   it.each([
     [DocumentType.VACCINE_RECORD, true, false],
     [DocumentType.PEDIGREE_CERT, false, true],
-  ])(
-    'only verifies the approved %s document type',
-    async (documentType, vaccineVerified, pedigreeVerified) => {
-      prisma.petDocument.count
-        .mockResolvedValueOnce(1)
-        .mockResolvedValueOnce(0)
-        .mockResolvedValueOnce(
-          documentType === DocumentType.VACCINE_RECORD ? 1 : 0,
-        )
-        .mockResolvedValueOnce(
-          documentType === DocumentType.PEDIGREE_CERT ? 1 : 0,
-        );
+  ])('only verifies the approved %s document type', async (documentType, vaccineVerified, pedigreeVerified) => {
+    prisma.petDocument.count
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(0)
+      .mockResolvedValueOnce(documentType === DocumentType.VACCINE_RECORD ? 1 : 0)
+      .mockResolvedValueOnce(documentType === DocumentType.PEDIGREE_CERT ? 1 : 0);
 
-      await service.reviewPetDocument(
-        { id: 'admin-1', name: 'Admin' },
-        'document-1',
-        { status: DocumentStatus.APPROVED },
-      );
+    await service.reviewPetDocument(
+      { id: 'admin-1', name: 'Admin' },
+      'document-1',
+      { status: DocumentStatus.APPROVED },
+    );
 
-      expect(prisma.pet.update).toHaveBeenCalledWith({
-        where: { id: 'pet-1' },
-        data: {
-          verificationBadge: VerificationBadge.VERIFIED,
-          vaccineVerified,
-          pedigreeVerified,
-        },
-      });
-    },
-  );
+    expect(prisma.pet.update).toHaveBeenCalledWith({
+      where: { id: 'pet-1' },
+      data: {
+        verificationBadge: VerificationBadge.VERIFIED,
+        vaccineVerified,
+        pedigreeVerified,
+      },
+    });
+  });
 });
 
 describe('AdminService spa bookings', () => {
@@ -679,40 +623,32 @@ describe('AdminService spa bookings', () => {
 
     const result = await service.getSpaBookings();
 
-    expect(spaBooking.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        orderBy: { scheduledAt: 'desc' },
-        include: expect.objectContaining({
-          addressSpa: expect.any(Object),
-          pet: expect.any(Object),
-          payment: expect.any(Object),
-          feedback: expect.any(Object),
-        }),
+    expect(spaBooking.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      orderBy: { scheduledAt: 'desc' },
+      include: expect.objectContaining({
+        addressSpa: expect.any(Object),
+        pet: expect.any(Object),
+        payment: expect.any(Object),
+        feedback: expect.any(Object),
       }),
-    );
-    expect(spaService.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: { in: ['service-main', 'service-extra'] } },
-      }),
-    );
-    expect(result[0]).toEqual(
-      expect.objectContaining({
-        mainServiceResolved: expect.objectContaining({ id: 'service-main' }),
-        subServices: [expect.objectContaining({ id: 'service-extra' })],
-      }),
-    );
+    }));
+    expect(spaService.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: { in: ['service-main', 'service-extra'] } },
+    }));
+    expect(result[0]).toEqual(expect.objectContaining({
+      mainServiceResolved: expect.objectContaining({ id: 'service-main' }),
+      subServices: [expect.objectContaining({ id: 'service-extra' })],
+    }));
   });
 
   it('does not query related services when a booking has no service identifiers', async () => {
     const spaBooking = {
-      findMany: jest.fn().mockResolvedValue([
-        {
-          id: 'booking-1',
-          mainServiceId: null,
-          subServiceIds: [],
-          service: { id: 'legacy-service', name: 'Gói Spa' },
-        },
-      ]),
+      findMany: jest.fn().mockResolvedValue([{
+        id: 'booking-1',
+        mainServiceId: null,
+        subServiceIds: [],
+        service: { id: 'legacy-service', name: 'Gói Spa' },
+      }]),
     };
     const spaService = { findMany: jest.fn() };
     const service = new AdminService(
@@ -724,7 +660,7 @@ describe('AdminService spa bookings', () => {
     const result = await service.getSpaBookings();
 
     expect(spaService.findMany).not.toHaveBeenCalled();
-    // Đảm bảo thông tin gói dịch vụ chính (mainServiceResolved) chứa đúng mã và tên dịch vụ cũ
+    // Kiểm tra gói dịch vụ Spa kế thừa (legacy) khớp với các trường cốt lõi
     expect(result[0].mainServiceResolved).toEqual(
       expect.objectContaining({
         id: 'legacy-service',
@@ -755,26 +691,24 @@ describe('AdminService store orders', () => {
       orderBy: { createdAt: 'asc' },
       select: { id: true },
     });
-    expect(order.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { storeId: 'store-1' },
-        orderBy: { createdAt: 'desc' },
-        select: expect.objectContaining({
-          customerNameSnapshot: true,
-          shippingAddress: true,
-          deliveryProofUrl: true,
-          refundStatus: true,
-          payment: expect.any(Object),
-          items: expect.objectContaining({
-            select: expect.objectContaining({
-              product: expect.any(Object),
-              variant: expect.any(Object),
-            }),
+    expect(order.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { storeId: 'store-1' },
+      orderBy: { createdAt: 'desc' },
+      select: expect.objectContaining({
+        customerNameSnapshot: true,
+        shippingAddress: true,
+        deliveryProofUrl: true,
+        refundStatus: true,
+        payment: expect.any(Object),
+        items: expect.objectContaining({
+          select: expect.objectContaining({
+            product: expect.any(Object),
+            variant: expect.any(Object),
           }),
-          reviews: expect.any(Object),
         }),
+        reviews: expect.any(Object),
       }),
-    );
+    }));
     expect(result).toEqual([{ id: 'order-1' }]);
   });
 
@@ -788,10 +722,8 @@ describe('AdminService store orders', () => {
     );
 
     await expect(service.getStoreOrders()).resolves.toEqual([]);
-    expect(order.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { storeId: '__missing__' },
-      }),
-    );
+    expect(order.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { storeId: '__missing__' },
+    }));
   });
 });

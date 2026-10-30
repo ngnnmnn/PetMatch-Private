@@ -43,7 +43,7 @@ describe('ShippingService', () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ total_price: 42000 }),
-      });
+      }) as jest.Mock;
 
     const result = await service.estimateAhamoveShippingFee(
       21.08,
@@ -53,7 +53,7 @@ describe('ShippingService', () => {
 
     const estimateRequest = (global.fetch as jest.Mock).mock.calls[1][1];
     const body = JSON.parse(estimateRequest.body);
-    // Kiểm tra cấu trúc payload điểm giao nhận gửi sang đối tác AhaMove theo đúng chuẩn API
+    // Xác minh cấu trúc điểm đón (Store) và điểm giao hàng (Khách) gửi sang AhaMove
     expect(body.path).toEqual([
       {
         address: '123 Đường Store, Hà Nội',
@@ -64,11 +64,11 @@ describe('ShippingService', () => {
       },
       {
         address: '456 Đường Khách, Hà Nội',
+        cod: 0,
         lat: 21.08,
         lng: 105.88,
         mobile: '0988888888',
         name: 'Khách hàng PetMatching',
-        cod: 0,
       },
     ]);
     expect(result.feeVnd).toBe(42000);
@@ -104,7 +104,7 @@ describe('ShippingService', () => {
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ order_id: 'AHA-TEST' }),
-      });
+      }) as jest.Mock;
 
     await service.createAhamoveShippingOrder('PM-TEST');
 

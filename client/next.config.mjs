@@ -3,11 +3,8 @@
  * Bỏ qua lỗi TypeScript khi build để đảm bảo quy trình build production hoạt động thông suốt
  */
 const nextConfig = {
-  experimental: {
-    // Tự động phân giải các barrel imports (như lucide-react, date-fns, framer-motion)
-    // Giảm dung lượng JS bundle tải về trình duyệt và tăng tốc độ tải trang
-    optimizePackageImports: ['lucide-react', 'date-fns', 'framer-motion'],
-  },
+  // Chế độ standalone để đóng gói Docker container siêu nhẹ (~100MB) phục vụ triển khai VPS Linux
+  output: 'standalone',
   typescript: {
     ignoreBuildErrors: true,
   },

@@ -41,15 +41,13 @@ export default function Footer() {
       <div className="mx-auto max-w-[1440px] px-4 py-14 md:px-6 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="relative grid h-10 w-10 place-items-center rounded-full overflow-hidden bg-white shadow-md border border-white/20 shrink-0">
-              <Image
+            <Image
                 src="/logo.png"
                 alt="PetMatch Logo"
                 width={36}
                 height={36}
-                className="h-full w-full object-cover"
+                className="shrink-0" style={{ width: 36, height: 36 }} unoptimized
               />
-            </span>
             <span className="text-lg font-extrabold tracking-tight">PetMatch</span>
           </div>
           <p className="mt-4 text-sm text-[var(--bg-page)]/70 leading-relaxed max-w-xs">

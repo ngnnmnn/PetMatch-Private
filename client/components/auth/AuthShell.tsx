@@ -14,26 +14,18 @@ export function BrandMark({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
     lg: 80,
   };
 
-  const containerSizes = {
-    sm: 'size-9',
-    md: 'size-14',
-    lg: 'size-20',
-  };
-
   return (
-    <span
-      className={`${containerSizes[size]} relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_8px_24px_rgba(228,93,28,0.18)] ring-2 ring-[var(--primary-color)]/25 transition-transform duration-200 hover:scale-105`}
+    <Image
+      src="/logo.png"
+      alt="PetMatch Logo"
+      width={pixelSizes[size]}
+      height={pixelSizes[size]}
+      className="shrink-0 transition-transform duration-200 hover:scale-105"
+      style={{ width: pixelSizes[size], height: pixelSizes[size] }}
       aria-hidden="true"
-    >
-      <Image
-        src="/logo.png"
-        alt="PetMatch Logo"
-        width={pixelSizes[size]}
-        height={pixelSizes[size]}
-        className="h-full w-full object-cover"
-        priority
-      />
-    </span>
+      priority
+      unoptimized
+    />
   );
 }
 

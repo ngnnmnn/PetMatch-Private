@@ -28,20 +28,10 @@ export const metadata: Metadata = {
   generator: 'PetMatch',
   icons: {
     icon: [
-      {
-        url: '/logo.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/logo.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
+      { url: '/icon-light-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/logo.png', sizes: '512x512', type: 'image/png' },
     ],
-    apple: '/logo.png',
+    apple: '/apple-icon.png',
   },
 };
 

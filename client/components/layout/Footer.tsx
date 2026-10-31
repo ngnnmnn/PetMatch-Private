@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Facebook, Instagram, Mail, MapPin, PawPrint, Youtube } from 'lucide-react';
 import Link from 'next/link';
-import PetMatchLogo from '@/components/ui/PetMatchLogo';
+import Image from 'next/image';
 import { spaApi } from '@/lib/api/spa';
 import { AddressSpaType } from '@/types';
 
@@ -41,10 +41,16 @@ export default function Footer() {
       <div className="mx-auto max-w-[1440px] px-4 py-14 md:px-6 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--primary-color)] text-white shadow-md">
-              <PetMatchLogo size={22} className="text-white" />
+            <span className="relative grid h-10 w-10 place-items-center rounded-full overflow-hidden bg-white shadow-md border border-white/20 shrink-0">
+              <Image
+                src="/logo.png"
+                alt="PetMatch Logo"
+                width={36}
+                height={36}
+                className="h-full w-full object-cover"
+              />
             </span>
-            <span className="text-lg font-extrabold tracking-tight">PetMatchAndStore</span>
+            <span className="text-lg font-extrabold tracking-tight">PetMatch</span>
           </div>
           <p className="mt-4 text-sm text-[var(--bg-page)]/70 leading-relaxed max-w-xs">
             Cửa hàng phụ kiện thú cưng hiện đại — đồng hành cùng bạn chăm sóc người bạn bốn chân.

@@ -1,32 +1,38 @@
 'use client';
 
 import Link from 'next/link';
-import PetMatchLogo from '@/components/ui/PetMatchLogo';
+import Image from 'next/image';
 
 type AuthShellProps = {
   children: React.ReactNode;
 };
 
 export function BrandMark({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
-  const sizes = {
+  const pixelSizes = {
+    sm: 36,
+    md: 56,
+    lg: 80,
+  };
+
+  const containerSizes = {
     sm: 'size-9',
     md: 'size-14',
     lg: 'size-20',
   };
 
-
-
-
-
-
-
-
   return (
     <span
-      className={`${sizes[size]} inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--primary-color)] text-white shadow-[0_12px_28px_rgba(228,93,28,0.22)]`}
+      className={`${containerSizes[size]} relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_8px_24px_rgba(228,93,28,0.18)] ring-2 ring-[var(--primary-color)]/25 transition-transform duration-200 hover:scale-105`}
       aria-hidden="true"
     >
-      <PetMatchLogo size={size === 'sm' ? 22 : size === 'md' ? 32 : 44} className="text-white" />
+      <Image
+        src="/logo.png"
+        alt="PetMatch Logo"
+        width={pixelSizes[size]}
+        height={pixelSizes[size]}
+        className="h-full w-full object-cover"
+        priority
+      />
     </span>
   );
 }
@@ -42,15 +48,6 @@ export default function AuthShell({ children }: AuthShellProps) {
           <BrandMark size="sm" />
           <span className="text-xl font-extrabold tracking-normal">PetMatch</span>
         </Link>
-
-        <nav className="ml-auto flex items-center gap-2 sm:gap-3" aria-label="Authentication navigation">
-          <Link
-            href="/login"
-            className="rounded-full border border-[var(--primary-color)] bg-transparent px-4 py-2.5 text-sm font-bold text-[var(--primary-color)] transition duration-200 ease-in-out hover:bg-[var(--bg-demo-box)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(228,93,28,0.18)] sm:px-6"
-          >
-            Đăng nhập
-          </Link>
-        </nav>
       </header>
 
       <section className="flex min-h-[calc(100vh-88px)] items-center justify-center px-5 py-8 sm:px-6">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Facebook, Instagram, Mail, MapPin, PawPrint, Youtube } from 'lucide-react';
 import Link from 'next/link';
+import PetMatchLogo from '@/components/ui/PetMatchLogo';
 import { spaApi } from '@/lib/api/spa';
 import { AddressSpaType } from '@/types';
 
@@ -41,7 +42,7 @@ export default function Footer() {
         <div>
           <div className="flex items-center gap-2">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--primary-color)] text-white shadow-md">
-              <PawPrint className="h-5 w-5" />
+              <PetMatchLogo size={22} className="text-white" />
             </span>
             <span className="text-lg font-extrabold tracking-tight">PetMatchAndStore</span>
           </div>

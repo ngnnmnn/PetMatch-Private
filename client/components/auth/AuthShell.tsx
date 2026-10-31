@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { PawPrint } from 'lucide-react';
+import PetMatchLogo from '@/components/ui/PetMatchLogo';
 
 type AuthShellProps = {
   children: React.ReactNode;
@@ -14,18 +14,19 @@ export function BrandMark({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
     lg: 'size-20',
   };
 
-  const iconSizes = {
-    sm: 'size-5',
-    md: 'size-7',
-    lg: 'size-10',
-  };
+
+
+
+
+
+
 
   return (
     <span
       className={`${sizes[size]} inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--primary-color)] text-white shadow-[0_12px_28px_rgba(228,93,28,0.22)]`}
       aria-hidden="true"
     >
-      <PawPrint className={iconSizes[size]} strokeWidth={2.6} />
+      <PetMatchLogo size={size === 'sm' ? 22 : size === 'md' ? 32 : 44} className="text-white" />
     </span>
   );
 }

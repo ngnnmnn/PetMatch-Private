@@ -126,6 +126,9 @@ jobs:
             echo "[PetMatching CD] Rebuild và cập nhật Docker containers..."
             docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
 
+            echo "[PetMatching CD] Nạp lại cấu hình Nginx Reverse Proxy..."
+            docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload || docker compose -f docker-compose.prod.yml restart nginx
+
             echo "[PetMatching CD] Thu hồi Docker images cũ không sử dụng..."
             docker image prune -f
 

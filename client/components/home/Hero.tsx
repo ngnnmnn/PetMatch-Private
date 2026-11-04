@@ -13,8 +13,7 @@ import {
   MapPin,
   CheckCircle2,
   ShieldCheck,
-  X,
-  RotateCcw,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -55,31 +54,45 @@ const SAMPLE_MATCH_PETS = [
  */
 export default function Hero() {
   const [petIndex, setPetIndex] = useState(0);
+  const [swipeDir, setSwipeDir] = useState<'left' | 'right' | null>(null);
   const [matchAction, setMatchAction] = useState<'liked' | 'passed' | null>(null);
+  const [isBusy, setIsBusy] = useState(false);
 
   const currentPet = SAMPLE_MATCH_PETS[petIndex];
+  const nextPet = SAMPLE_MATCH_PETS[(petIndex + 1) % SAMPLE_MATCH_PETS.length];
 
   /**
-   * Xử lý khi người dùng tương tác nút "Thích / Ghép đôi"
-   * Hiển thị phản hồi thị giác tức thì và tự động chuyển sang hồ sơ tiếp theo sau 1.2 giây
+   * Xử lý khi người dùng tương tác nút "Thích / Ghép đôi":
+   * Hiệu ứng tim đập ăn mừng và trượt nhẹ mượt mà sau 750ms
    */
   const handleLike = () => {
+    if (isBusy) return;
+    setIsBusy(true);
+    setSwipeDir('right');
     setMatchAction('liked');
     setTimeout(() => {
       setPetIndex((prev) => (prev + 1) % SAMPLE_MATCH_PETS.length);
+      setSwipeDir(null);
       setMatchAction(null);
-    }, 1200);
+      setIsBusy(false);
+    }, 750);
   };
 
   /**
-   * Xử lý khi người dùng tương tác nút "Bỏ qua / Xem bé khác"
+   * Xử lý khi người dùng tương tác nút "Bỏ qua / Xem bé khác":
+   * Vuốt nhanh sang trái 240ms theo chuẩn Tinder, không làm khựng hay đơ giao diện
    */
   const handlePass = () => {
+    if (isBusy) return;
+    setIsBusy(true);
+    setSwipeDir('left');
     setMatchAction('passed');
     setTimeout(() => {
       setPetIndex((prev) => (prev + 1) % SAMPLE_MATCH_PETS.length);
+      setSwipeDir(null);
       setMatchAction(null);
-    }, 400);
+      setIsBusy(false);
+    }, 240);
   };
 
   return (
@@ -87,36 +100,29 @@ export default function Hero() {
       className="relative overflow-hidden bg-gradient-to-b from-[#FBF8F3] via-[#FAF6F0] to-[#FAF8F5] border-b border-[#ECE6DC] py-10 sm:py-14 lg:py-16"
       aria-label="Khu vực giới thiệu chính PetMatch"
     >
-      {/* Các vệt sáng màu hữu cơ trôi bồng bềnh tạo chiều sâu thị giác (Organic Ambient Glows) */}
-      <motion.div
-        animate={{
-          scale: [1, 1.12, 1],
-          x: [0, 20, 0],
-          y: [0, -15, 0],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-        className="pointer-events-none absolute -top-20 -left-20 h-96 w-96 rounded-full bg-orange-200/40 blur-3xl"
+      {/* Các vệt sáng màu hữu cơ: Tối ưu tĩnh để giải phóng GPU trên thiết bị di động (như Note 20) */}
+      <div
+        className="pointer-events-none absolute -top-20 -left-20 h-96 w-96 rounded-full bg-orange-200/40 blur-3xl opacity-75"
         aria-hidden="true"
       />
-      <motion.div
-        animate={{
-          scale: [1, 1.15, 1],
-          x: [0, -20, 0],
-          y: [0, 15, 0],
-        }}
-        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        className="pointer-events-none absolute top-1/3 -right-20 h-96 w-96 rounded-full bg-rose-200/35 blur-3xl"
+      <div
+        className="pointer-events-none absolute top-1/3 -right-20 h-96 w-96 rounded-full bg-rose-200/35 blur-3xl opacity-70"
         aria-hidden="true"
       />
-      <motion.div
-        animate={{
-          scale: [1, 1.1, 1],
-          y: [0, 12, 0],
-        }}
-        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-        className="pointer-events-none absolute -bottom-10 left-1/3 h-80 w-80 rounded-full bg-emerald-100/40 blur-3xl"
+      <div
+        className="pointer-events-none absolute -bottom-10 left-1/3 h-80 w-80 rounded-full bg-emerald-100/40 blur-3xl hidden sm:block opacity-60"
         aria-hidden="true"
       />
+      {/* Preload ảnh bé cưng tiếp theo để loại bỏ giật khựng giải mã ảnh trên thiết bị di động */}
+      <div className="hidden" aria-hidden="true">
+        <Image
+          src={nextPet.image}
+          alt="Preload next pet"
+          width={10}
+          height={10}
+          priority
+        />
+      </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
@@ -311,21 +317,32 @@ export default function Hero() {
                 </div>
               </motion.div>
 
-              {/* KHUNG THẺ TƯƠNG TÁC CHÍNH (Claymorphic Interactive Card) */}
-              <motion.div
-                layout
-                className="relative overflow-hidden rounded-[28px] border-2 border-white/80 bg-white p-3 sm:p-4 shadow-2xl shadow-orange-950/10"
+              {/* KHUNG THẺ TƯƠNG TÁC CHÍNH (Claymorphic Interactive Card - Hardware Accelerated) */}
+              <div
+                className="relative overflow-hidden rounded-[28px] border-2 border-white/80 bg-white p-3 sm:p-4 shadow-2xl shadow-orange-950/10 transform-gpu"
               >
                 {/* Ảnh thú cưng chất lượng cao */}
-                <div className="relative aspect-[4/3.8] w-full overflow-hidden rounded-2xl bg-stone-100">
-                  <AnimatePresence mode="wait">
+                <div className="relative aspect-[4/3.8] w-full overflow-hidden rounded-2xl bg-stone-100 transform-gpu">
+                  <AnimatePresence initial={false} mode="popLayout">
                     <motion.div
                       key={currentPet.id}
-                      initial={{ opacity: 0, scale: 1.05 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.35 }}
-                      className="absolute inset-0"
+                      initial={
+                        swipeDir === 'left'
+                          ? { opacity: 0, x: 90, scale: 0.96 }
+                          : swipeDir === 'right'
+                          ? { opacity: 0, x: -90, scale: 0.96 }
+                          : { opacity: 0, scale: 0.98 }
+                      }
+                      animate={{ opacity: 1, x: 0, scale: 1, rotate: 0 }}
+                      exit={
+                        swipeDir === 'left'
+                          ? { opacity: 0, x: -280, rotate: -12, transition: { duration: 0.22, ease: [0.32, 0.72, 0, 1] } }
+                          : swipeDir === 'right'
+                          ? { opacity: 0, x: 280, rotate: 12, transition: { duration: 0.24, ease: [0.32, 0.72, 0, 1] } }
+                          : { opacity: 0, transition: { duration: 0.15 } }
+                      }
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="absolute inset-0 will-change-transform"
                     >
                       <Image
                         src={currentPet.image}
@@ -333,58 +350,45 @@ export default function Hero() {
                         fill
                         priority
                         className="object-cover object-center"
-                        sizes="(max-width: 1024px) 100vw, 40vw"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-stone-950/20 to-transparent" />
                     </motion.div>
                   </AnimatePresence>
 
                   {/* Thanh phần trăm tương thích nằm ở góc trên */}
-                  <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-900/75 backdrop-blur-md px-3 py-1 text-xs font-bold text-white border border-white/20">
+                  <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10 pointer-events-none">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-900/80 px-3 py-1 text-xs font-bold text-white border border-white/20">
                       <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                       <span>{currentPet.age}</span>
                     </span>
 
-                    <motion.div
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                    <div
                       className="inline-flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1 text-xs font-extrabold text-white shadow-md shadow-rose-600/30"
                     >
                       <Heart className="h-3.5 w-3.5 fill-white" />
                       <span>{currentPet.score}% Tương thích</span>
-                    </motion.div>
+                    </div>
                   </div>
 
-                  {/* Lớp phủ phản hồi hành động Thích/Bỏ qua khi người dùng bấm */}
+                  {/* Lớp phủ phản hồi hành động Thích khi người dùng bấm */}
                   <AnimatePresence>
                     {matchAction === 'liked' && (
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
+                        initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-rose-600/85 backdrop-blur-xs text-white"
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-rose-600/90 text-white transform-gpu will-change-transform"
                       >
                         <motion.div
                           animate={{ scale: [1, 1.25, 1] }}
-                          transition={{ duration: 0.5, repeat: 2 }}
+                          transition={{ duration: 0.4, repeat: 1 }}
                         >
                           <Heart className="h-20 w-20 fill-white text-white drop-shadow-lg" />
                         </motion.div>
                         <p className="mt-2 text-xl font-extrabold font-heading">Ghép đôi thành công!</p>
                         <p className="text-xs text-rose-100 font-medium">Đã gửi tín hiệu tới phụ huynh của bé</p>
-                      </motion.div>
-                    )}
-
-                    {matchAction === 'passed' && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.7 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-stone-900/80 backdrop-blur-xs text-white"
-                      >
-                        <RotateCcw className="h-14 w-14 text-stone-300 animate-spin" />
-                        <p className="mt-2 text-sm font-bold">Đang tải hồ sơ bé tiếp theo...</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -422,47 +426,43 @@ export default function Hero() {
                     "{currentPet.story}"
                   </p>
 
-                  {/* Bộ 3 nút điều khiển quẹt thẻ tương tác sống động */}
+                  {/* Bộ 3 nút điều khiển quẹt thẻ tương tác phản hồi tức thì (120 FPS trên di động) */}
                   <div className="flex items-center justify-center gap-4 pt-1">
                     {/* Nút Bỏ qua / Xem bé khác */}
-                    <motion.button
+                    <button
                       type="button"
-                      whileHover={{ scale: 1.1, rotate: -6 }}
-                      whileTap={{ scale: 0.9 }}
+                      disabled={isBusy}
                       onClick={handlePass}
-                      className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-stone-200 bg-white text-stone-400 hover:text-stone-700 hover:border-stone-300 shadow-sm transition cursor-pointer"
+                      className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-stone-200 bg-white text-stone-400 hover:text-stone-700 hover:border-stone-300 shadow-sm active:scale-90 transition-transform duration-150 cursor-pointer touch-manipulation select-none disabled:opacity-60"
                       title="Xem bé tiếp theo"
                       aria-label="Xem bé tiếp theo"
                     >
                       <X className="h-5 w-5 stroke-[2.5]" />
-                    </motion.button>
+                    </button>
 
                     {/* Nút Khám phá chi tiết */}
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Link
-                        href="/explore"
-                        className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-stone-900 px-5 text-xs font-bold text-white hover:bg-stone-800 shadow-md cursor-pointer"
-                      >
-                        <span>Xem toàn bộ hồ sơ</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </motion.div>
+                    <Link
+                      href="/explore"
+                      className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-stone-900 px-5 text-xs font-bold text-white hover:bg-stone-800 shadow-md active:scale-95 transition-transform duration-150 cursor-pointer touch-manipulation select-none"
+                    >
+                      <span>Xem toàn bộ hồ sơ</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
 
                     {/* Nút Thích / Gửi yêu cầu ghép đôi */}
-                    <motion.button
+                    <button
                       type="button"
-                      whileHover={{ scale: 1.15, rotate: 6 }}
-                      whileTap={{ scale: 0.88 }}
+                      disabled={isBusy}
                       onClick={handleLike}
-                      className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-500 text-white shadow-lg shadow-rose-500/30 hover:bg-rose-600 transition cursor-pointer"
+                      className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-500 text-white shadow-lg shadow-rose-500/30 hover:bg-rose-600 active:scale-90 transition-transform duration-150 cursor-pointer touch-manipulation select-none disabled:opacity-60"
                       title="Thích bé này"
                       aria-label="Thích bé này"
                     >
                       <Heart className="h-5 w-5 fill-white stroke-[2.5]" />
-                    </motion.button>
+                    </button>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>

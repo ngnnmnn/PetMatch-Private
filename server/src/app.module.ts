@@ -16,6 +16,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
 import { VouchersModule } from './modules/vouchers/vouchers.module';
 import { BreedsModule } from './modules/breeds/breeds.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { HealthModule } from './modules/health/health.module';
 import { MemoryCacheModule } from './common/cache/memory-cache.module';
 
 @Module({
@@ -38,6 +39,7 @@ import { MemoryCacheModule } from './common/cache/memory-cache.module';
     VouchersModule,
     BreedsModule,
     NotificationsModule,
+    HealthModule,
   ],
 })
 export class AppModule {}

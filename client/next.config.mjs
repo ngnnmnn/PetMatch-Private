@@ -3,6 +3,8 @@
  * Bỏ qua lỗi TypeScript khi build để đảm bảo quy trình build production hoạt động thông suốt
  */
 const nextConfig = {
+  // Cho phép kết nối từ IP mạng LAN (ví dụ điện thoại kiểm thử) trong môi trường dev
+  allowedDevOrigins: ['192.168.88.169', 'localhost:3000'],
   // Chế độ standalone để đóng gói Docker container siêu nhẹ (~100MB) phục vụ triển khai VPS Linux
   output: 'standalone',
   typescript: {

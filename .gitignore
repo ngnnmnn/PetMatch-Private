@@ -12,6 +12,9 @@ yarn-error.log*
 
 # Testing
 coverage/
+playwright-report/
+test-results/
+blob-report/
 
 # Environment files & Private Handover
 .env

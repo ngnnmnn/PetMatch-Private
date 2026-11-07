@@ -43,22 +43,6 @@ Canonical triage roles mapped to 5 default labels (`needs-triage`, `needs-info`,
 
 Single-context layout (`GLOSSARY.md` and `docs/adr/`). See `docs/agents/domain.md`.
 
----
+### Active task tracker & DevOps roadmap
 
-## PetMatch Project Specific Rules (Safety & Workflows)
-
-### 1. Database Migration Rule (Critical)
-- **Tuyệt đối an toàn dữ liệu:** Database kết nối trực tiếp với Supabase PostgreSQL. Tuyệt đối không chạy các lệnh có nguy cơ xóa dữ liệu như `prisma migrate reset` khi chưa có xác nhận từ người dùng.
-- Khi thay đổi cấu trúc Database (`schema.prisma`):
-  - Luôn tạo file migration SQL chuẩn trong `server/prisma/migrations/` với cú pháp an toàn tuyệt đối (`DROP TABLE IF EXISTS ... CASCADE`, `DROP COLUMN IF EXISTS ...`).
-
-### 2. Git Workflow Rule
-- Trước khi bắt đầu làm bất kỳ công việc mới nào, luôn kiểm tra trạng thái và cập nhật code mới từ nhánh chính (`main`): `git fetch origin main`.
-- Nếu có cập nhật mới hoặc có xung đột (conflict), phải thông báo ngay cho người dùng để kiểm tra trước khi tiếp tục.
-- **Tuyệt đối không tự ý chạy lệnh `git commit` hoặc `git push`** khi chưa có yêu cầu cụ thể từ người dùng.
-- Luôn dọn dẹp các file rác/tạm thời trước khi kết thúc công việc.
-
-### 3. Preserving System & Verification
-- Luôn giữ lại giao diện và các chức năng gốc hiện có, chỉ thay đổi hoặc xóa khi người dùng yêu cầu rõ ràng.
-- Sau khi hoàn thành công việc, luôn chạy thử kiểm tra (verify kết nối/build/test) và báo cáo kết quả thực tế cho người dùng.
-
+All current priorities, audited UI/UX & backend backlog items, and handover notes live in `docs/agents/TASK-TRACKER.md` and `docs/agents/DEVOPS-ROADMAP.md`. Read `docs/agents/TASK-TRACKER.md` at the start of a new session.

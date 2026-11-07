@@ -10,6 +10,10 @@ services:
     restart: always
     env_file:
       - ./server/.env
+    environment:
+      CLIENT_URL: https://petmatch.io.vn
+      FRONTEND_URL: https://petmatch.io.vn
+      GOOGLE_CALLBACK_URL: https://petmatch.io.vn/api/auth/google/callback
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5000/api/health || exit 1"]
       interval: 30s

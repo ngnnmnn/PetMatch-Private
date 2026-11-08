@@ -118,6 +118,12 @@ jobs:
               cp /tmp/petmatch_server.env.bak server/.env
             fi
 
+            # Đồng bộ khóa Google OAuth mới nhất từ GitHub Secrets vào server/.env trên VPS
+            if [ -n "${{ secrets.GOOGLE_CLIENT_ID }}" ]; then
+              sed -i 's|^GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"|' server/.env
+              sed -i 's|^GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"|' server/.env
+            fi
+
             if [ ! -f server/.env ]; then
               echo "LỖI: Không tìm thấy server/.env trên VPS!"
               exit 1
@@ -133,4 +139,3 @@ jobs:
             docker compose -f docker-compose.prod.yml ps
 
             echo "[PetMatching CD] Triển khai thành công!"
-

@@ -132,29 +132,17 @@ export default function Hero() {
           
           {/* CỘT TRÁI (7/12 cột): Thông điệp chính, giá trị cốt lõi & CTA */}
           <div className="lg:col-span-7 space-y-6">
-            
-            {/* Huy hiệu định vị thương hiệu tinh gọn */}
-            <motion.div
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45 }}
-              className="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-1.5 text-xs font-bold text-orange-950 border border-orange-200/90 shadow-xs"
-            >
-              <span className="h-2 w-2 rounded-full bg-[var(--primary-color)]" />
-              <Sparkles className="h-4 w-4 text-[var(--primary-color)]" />
-              <span>Nền tảng kết nối & chăm sóc thú cưng toàn diện #1</span>
-            </motion.div>
 
-            {/* Tiêu đề chính sử dụng phông Nunito sắc nét, chuẩn tiếng Việt */}
+            {/* Tiêu đề chính sử dụng phông Nunito sắc nét, giữ nguyên cụm từ tiếng Việt không gãy dòng */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+              transition={{ duration: 0.55 }}
               className="space-y-4"
             >
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 font-heading leading-[1.18] tracking-tight text-balance">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 font-heading leading-[1.2] tracking-tight">
                 Nơi bé cưng tìm thấy{' '}
-                <span className="relative inline-block text-[var(--primary-color)]">
+                <span className="relative inline-block whitespace-nowrap text-[var(--primary-color)]">
                   bạn đời lý tưởng
                   <svg
                     className="absolute -bottom-1.5 left-0 w-full text-orange-300 -z-10"
@@ -170,7 +158,8 @@ export default function Hero() {
                     />
                   </svg>
                 </span>{' '}
-                & tận hưởng dịch vụ chuẩn 5 sao
+                <span className="whitespace-nowrap">&amp; tận hưởng</span>{' '}
+                <span className="whitespace-nowrap">dịch vụ chuẩn 5 sao</span>
               </h1>
 
               <p className="text-sm sm:text-base text-stone-600 leading-relaxed max-w-xl font-normal">

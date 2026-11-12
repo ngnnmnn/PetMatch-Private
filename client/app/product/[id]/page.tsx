@@ -443,7 +443,7 @@ export default function ProductDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-main)]">
-        <AppHeader sectionLabel="Store" />
+        <AppHeader sectionLabel="Cửa hàng" />
         <div className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-[var(--primary-color)]" />
           <p className="text-sm font-semibold text-[var(--text-muted)]">Đang tải chi tiết sản phẩm...</p>
@@ -455,7 +455,7 @@ export default function ProductDetailPage() {
   if (error || !product) {
     return (
       <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-main)]">
-        <AppHeader sectionLabel="Store" />
+        <AppHeader sectionLabel="Cửa hàng" />
         <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6">
           <div className="rounded-lg border border-red-100 bg-red-50 p-8 shadow-sm">
             <h2 className="text-xl font-bold text-red-600">Lỗi tải trang</h2>
@@ -530,13 +530,8 @@ export default function ProductDetailPage() {
   ).filter((img): img is string => !!img);
 
   return (
-    <div
-      className="min-h-screen bg-[var(--bg-page)] text-[var(--text-main)] font-sans"
-      style={{
-        fontFamily: 'Inter, Outfit, ui-sans-serif, system-ui, sans-serif',
-      }}
-    >
-      <AppHeader sectionLabel="Store" />
+    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-main)] font-sans">
+      <AppHeader sectionLabel="Cửa hàng" />
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
         {/* Breadcrumb & Navigation */}

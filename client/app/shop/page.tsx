@@ -509,7 +509,6 @@ function ShopPageContent() {
       className="min-h-screen text-[var(--text-main)] flex flex-col justify-between animate-in fade-in duration-300 relative"
       style={{
         backgroundColor: 'var(--bg-page)',
-        fontFamily: 'Inter, Outfit, ui-sans-serif, system-ui, sans-serif',
       }}
     >
       <div className="w-full">

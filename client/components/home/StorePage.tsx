@@ -167,7 +167,9 @@ export default function StorePage() {
                 <span>Hệ sinh thái PetMatch</span>
               </p>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-heading text-stone-900 tracking-tight">
-                Mọi điều thú cưng cần, gói trọn trong một nền tảng
+                Mọi điều thú cưng cần,{' '}
+                <span className="whitespace-nowrap">gói trọn</span> trong{' '}
+                <span className="whitespace-nowrap">một nền tảng</span>
               </h2>
               <p className="text-xs sm:text-sm text-stone-600 font-medium">
                 Chọn dịch vụ bạn muốn trải nghiệm cùng bé yêu hôm nay

@@ -107,7 +107,7 @@ export default function AppHeader({ sectionLabel = 'Trang chủ' }: AppHeaderPro
               className={cn(
                 'flex items-center gap-2 px-4 py-2 rounded-xl text-[13.5px] font-bold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40',
                 isShopSection
-                  ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-md shadow-teal-600/25 ring-2 ring-teal-300/40'
+                  ? 'bg-gradient-to-r from-teal-700 to-cyan-700 text-white shadow-md shadow-teal-700/25 ring-2 ring-teal-300/40'
                   : 'text-muted-foreground hover:text-foreground hover:bg-background/80 hover:shadow-xs'
               )}
             >
@@ -120,7 +120,7 @@ export default function AppHeader({ sectionLabel = 'Trang chủ' }: AppHeaderPro
               className={cn(
                 'flex items-center gap-2 px-4 py-2 rounded-xl text-[13.5px] font-bold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40',
                 isSpaSection
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-300/40'
+                  ? 'bg-gradient-to-r from-emerald-700 to-green-700 text-white shadow-md shadow-emerald-700/25 ring-2 ring-emerald-300/40'
                   : 'text-muted-foreground hover:text-foreground hover:bg-background/80 hover:shadow-xs'
               )}
             >

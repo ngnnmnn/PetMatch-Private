@@ -1,15 +1,17 @@
 import { redirect } from 'next/navigation';
 
-export default function HomeProductIdRedirect({
+export default async function HomeProductIdRedirect({
   params,
   searchParams,
 }: {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const { id } = await params;
+  const resolvedSearchParams = await searchParams;
   const query = new URLSearchParams();
-  if (searchParams) {
-    Object.entries(searchParams).forEach(([key, val]) => {
+  if (resolvedSearchParams) {
+    Object.entries(resolvedSearchParams).forEach(([key, val]) => {
       if (typeof val === 'string') {
         query.set(key, val);
       } else if (Array.isArray(val)) {
@@ -18,5 +20,5 @@ export default function HomeProductIdRedirect({
     });
   }
   const queryString = query.toString() ? `?${query.toString()}` : '';
-  redirect(`/product/${params.id}${queryString}`);
+  redirect(`/product/${id}${queryString}`);
 }

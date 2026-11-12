@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ChevronDown, LogOut, MessageCircle, Package, Scissors, ShieldCheck, User } from 'lucide-react';
 import { User as UserType } from '@/types';
@@ -57,7 +58,7 @@ export default function UserDropdown() {
       <button
         type="button"
         onClick={() => router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`)}
-        className="flex h-10 items-center justify-center rounded-md border border-[var(--primary-color)] bg-primary px-4 text-sm font-extrabold text-white shadow-sm transition hover:bg-primary/95 focus-visible:outline-none"
+        className="flex h-11 min-w-11 items-center justify-center rounded-xl border border-[var(--primary-color)] bg-primary px-4 text-sm font-extrabold text-white shadow-sm transition hover:bg-primary/95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-color)]/40"
       >
         Đăng nhập
       </button>
@@ -68,17 +69,23 @@ export default function UserDropdown() {
     <div ref={ref} className="relative">
       <button
         type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="Tài khoản người dùng"
         onClick={() => setOpen((value) => !value)}
-        className="flex h-10 items-center gap-1.5 rounded-md border border-[#EFEAE2] bg-white px-1.5 shadow-sm transition hover:border-[rgba(228,93,28,0.28)]"
+        className="flex h-11 min-w-11 items-center gap-1.5 rounded-xl border border-[#EFEAE2] bg-white px-2 shadow-sm transition hover:border-[rgba(228,93,28,0.28)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-color)]/40"
       >
         {user.avatarUrl ? (
-          <img
+          <Image
             src={user.avatarUrl}
             alt={user.name}
-            className="size-8 rounded-full object-cover ring-2 ring-[var(--primary-color)]"
+            width={32}
+            height={32}
+            unoptimized
+            className="size-8 rounded-lg object-cover ring-2 ring-[var(--primary-color)]"
           />
         ) : (
-          <div className="flex size-8 items-center justify-center rounded-full bg-[var(--primary-color)] text-sm font-bold text-white">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-[var(--primary-color)] text-sm font-bold text-white">
             {user.name.charAt(0).toUpperCase()}
           </div>
         )}

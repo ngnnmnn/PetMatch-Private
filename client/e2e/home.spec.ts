@@ -56,7 +56,89 @@ test.describe('Trang chủ PetMatch (/home)', () => {
     await expect(cartLink).toBeVisible();
     await expect(cartLink).toHaveAttribute('href', '/cart');
 
-    // Kiểm tra Footer hiển thị thông tin bản quyền
-    await expect(page.getByText(/PetMatchAndStore/i)).toBeVisible();
+    // Kiểm tra Footer hiển thị thông tin bản quyền và các liên kết hợp lệ (không có /match 404)
+    const footer = page.locator('footer');
+    await expect(footer.getByText(/PetMatchAndStore/i)).toBeVisible();
+    await expect(footer.getByRole('link', { name: 'Ghép đôi thú cưng' })).toHaveAttribute('href', '/explore');
+    await expect(footer.getByRole('link', { name: 'Cửa hàng phụ kiện' })).toHaveAttribute('href', '/shop');
+    await expect(footer.getByRole('link', { name: 'Dịch vụ Spa 5 sao' })).toHaveAttribute('href', '/spa');
+  });
+
+  test('4. Điều hướng Mobile mở được menu dịch vụ & trang 404 có nút quay lại', async ({ page, isMobile }) => {
+    if (isMobile) {
+      const toggle = page.getByRole('button', { name: 'Mở menu điều hướng' });
+      await expect(toggle).toBeVisible();
+      await toggle.click();
+      const mobileNav = page.locator('#mobile-nav');
+      await expect(mobileNav.getByRole('link', { name: 'Cửa hàng' })).toHaveAttribute('href', '/shop');
+      await expect(mobileNav.getByRole('link', { name: 'Spa & Làm đẹp' })).toHaveAttribute('href', '/spa');
+      await expect(mobileNav.getByRole('link', { name: 'Khám phá' })).toHaveAttribute('href', '/explore');
+    }
+
+    await page.goto('/match');
+    await expect(page.getByRole('heading', { name: 'Trang bạn tìm không tồn tại' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Về trang chủ' })).toHaveAttribute('href', '/home');
+  });
+
+  test('5. Lọc sản phẩm nổi bật theo tồn kho biến thể & hiển thị Empty State khi hết hàng (W2)', async ({
+    page,
+  }) => {
+    await page.route('**/products/featured*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 'prod-variant-stock',
+            name: 'Hạt Dinh Dưỡng Biến Thể Còn Hàng',
+            brand: 'Royal Canin',
+            sellingPrice: 350000,
+            stock: 0,
+            isActive: true,
+            isFeatured: true,
+            targetSpecies: 'DOG',
+            rating: 4.8,
+            reviewCount: 12,
+            soldCount: 8,
+            imageUrl: '/hero-pets.jpg',
+            variants: [
+              { id: 'v1', name: 'Túi 2kg', sellingPrice: 350000, stock: 5, isActive: true },
+            ],
+          },
+          {
+            id: 'prod-out-of-stock',
+            name: 'Sản Phẩm Đã Hết Hàng Hoàn Toàn',
+            brand: 'PetCare',
+            sellingPrice: 120000,
+            stock: 0,
+            isActive: true,
+            isFeatured: true,
+            targetSpecies: 'CAT',
+            rating: 4.5,
+            reviewCount: 2,
+            imageUrl: '/hero-spa.jpg',
+            variants: [],
+          },
+        ]),
+      });
+    });
+
+    await page.goto('/home');
+    const featuredSection = page.getByRole('region', { name: 'Sản phẩm nổi bật' });
+    await expect(featuredSection.getByText('Hạt Dinh Dưỡng Biến Thể Còn Hàng')).toBeVisible();
+    await expect(featuredSection.getByText('Sản Phẩm Đã Hết Hàng Hoàn Toàn')).toBeHidden();
+
+    // Kiểm tra Empty State khi không có sản phẩm nổi bật nào còn hàng
+    await page.route('**/products/featured*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([]),
+      });
+    });
+
+    await page.reload();
+    await expect(featuredSection.getByRole('heading', { name: 'Đang cập nhật thêm sản phẩm nổi bật' })).toBeVisible();
+    await expect(featuredSection.getByRole('link', { name: 'Khám phá cửa hàng' })).toHaveAttribute('href', '/shop');
   });
 });

@@ -7,9 +7,6 @@ const nextConfig = {
   allowedDevOrigins: ['192.168.88.169', 'localhost:3000'],
   // Chế độ standalone để đóng gói Docker container siêu nhẹ (~100MB) phục vụ triển khai VPS Linux
   output: 'standalone',
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     // Tự động chuyển đổi định dạng ảnh sang WebP và AVIF để nén dung lượng tới 70-80%
     formats: ['image/avif', 'image/webp'],

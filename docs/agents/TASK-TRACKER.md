@@ -22,18 +22,15 @@
 - [x] **Cài đặt Playwright E2E cho Frontend:** Đã thiết lập `client/playwright.config.ts`, `client/e2e/home.spec.ts` và các script `npm run test:e2e`, `npm run test:e2e:ui`, `npm run test:e2e:headed`.
 - [x] **Tối ưu Hero Section 120 FPS:** Đã loại bỏ GPU blur lặp vô hạn và layout thrashing khi quẹt thẻ trên thiết bị di động.
 - [x] **DevOps Phase 1:** Đã triển khai `/api/health`, Nginx Rate Limiting và Docker Healthchecks lên `https://petmatch.io.vn`.
+- [x] **Nâng cấp UI/UX Trang chủ & Điều hướng (W1, W2, W3, W7, M1–M5):** Sửa link Footer `/match` → `/explore` + bổ sung `/shop`, `/spa` và `aria-label` riêng; lọc sản phẩm theo `isValidProductForRecommendation` + thêm Empty State; sửa `params` bất đồng bộ ở `home/product/[id]/page.tsx` và tắt `ignoreBuildErrors: true`; thêm menu Mobile `< 768px`; chuẩn hóa preload ảnh Hero đúng `sizes`; bỏ `repeat: Infinity` trên lớp `backdrop-blur`; nâng touch target `≥ 44px` (gồm cả `NotificationBell`); nâng badge tối thiểu `11px` + tạo trang `not-found.tsx` (404).
 
 ### 🛠️ Các hạng mục Giao diện Web (`client/`) CÒN LẠI:
 
 | Mức | # | Hạng mục trên Web (`client/`) | Vị trí file | Cách sửa ngắn gọn |
 |---|---|---|---|---|
-| 🟠 High | W1 | **Link `/match` bị lỗi 404 ở Footer & thiếu link nhanh** | `client/components/layout/Footer.tsx` | Đổi `/match` → `/explore`, bổ sung link `/shop` và `/spa`, thêm `aria-label` riêng cho Facebook/Instagram/YouTube |
-| 🟠 High | W2 | **Lọc sót sản phẩm có phân loại (Variants) & thiếu Empty State trên trang chủ** | `client/components/home/StorePage.tsx` | Dùng hàm `isValidProductForRecommendation(product)` thay vì chỉ check `product.stock > 0`; thêm khung Empty State khi hết hàng |
-| 🟠 High | W3 | **Đang bật `ignoreBuildErrors: true` che giấu lỗi TypeScript khi build** | `client/next.config.mjs:L10-12` | Xóa `typescript: { ignoreBuildErrors: true }` (codebase hiện tại chạy `tsc --noEmit` đã 0 lỗi) |
 | 🟡 Med | W4 | **Gọi `setState` đồng bộ trong `useEffect` gây render kép khi đổi thú cưng** | `client/app/explore/page.tsx:L1506` | Bỏ `useEffect` reset `setActivePhotoIdx(0)`, truyền `key={pet.id}` vào cụm hiển thị ảnh |
-| 🟡 Med | W5 | **Dùng thẻ `<img>` thuần thay vì `<Image />` của Next.js** | `client/app/explore/page.tsx:L557, L1255`, `UserDropdown.tsx:L75` | Chuyển sang `next/image` để tự động nén WebP/AVIF và lazy-load |
+| 🟡 Med | W5 | **Dùng thẻ `<img>` thuần thay vì `<Image />` của Next.js** | `client/app/explore/page.tsx:L557, L1255` *(đã xong `UserDropdown.tsx`)* | Chuyển sang `next/image` để tự động nén WebP/AVIF và lazy-load |
 | 🟡 Med | W6 | **Chuyển trang cứng `window.location.href = "/login"` khi hết hạn token** | `client/lib/axios.ts:L55` | Tránh reload trắng toàn trang khi đang ở trang public hoặc thông báo mượt trước khi điều hướng |
-| 🔵 Low | W7 | **Hiệu ứng hover `group-hover:scale-108` sai cú pháp Tailwind & biến state thừa** | `client/components/home/StorePage.tsx`, `Hero.tsx` | Đổi thành `group-hover:scale-105`, xóa `activeStepTab` thừa, bỏ `cursor-pointer` ở 4 avatar chữ cái tĩnh |
 | 🔵 Low | W8 | **2 trang Quản lý quá lớn (>5.500 dòng/file)** | `client/app/manager/page.tsx`, `client/app/managerSpa/page.tsx` | Tách dần các Tab/Modal ra component con khi cần chỉnh sửa tính năng quản lý |
 
 ### ⚙️ Các hạng mục Backend (`server/`) CÒN LẠI:
@@ -47,12 +44,12 @@
 
 ## 3. 📱 Giao Diện Mobile (Từ đợt `/ui-ux-pro-max` — GitHub Issue #1)
 
-> Đặc tả chi tiết đã được xuất bản trên GitHub Issues: **Issue #1** (`gh issue view 1`).
+> Đặc tả chi tiết đã được xuất bản trên GitHub Issues: **Issue #1** (`gh issue view 1`). Toàn bộ M1–M5 đã được xử lý trong nhánh hiện tại; chờ commit & kiểm tra lại issue.
 
-| Mức | # | Hạng mục trên Mobile (`< 768px`) | Vị trí file | Cách sửa ngắn gọn |
+| Mức | # | Hạng mục trên Mobile (`< 768px`) | Trạng thái | Vị trí file |
 |---|---|---|---|---|
-| 🔴 Critical | M1 | **Mất hoàn toàn thanh điều hướng chính trên màn hình điện thoại** | `client/components/layout/AppHeader.tsx:L89` | Bổ sung thanh điều hướng Mobile cho *Cửa hàng, Spa, Ghép đôi* dưới màn hình `< 768px` |
-| 🟠 High | M2 | **Preload ảnh thú cưng tiếp theo sai kích thước (`10x10`)** | `client/components/home/Hero.tsx:L118` | Preload đúng `sizes` của thẻ chính để quẹt thẻ trên mobile không phải tải lại ảnh |
-| 🟠 High | M3 | **Animation `repeat: Infinity` đè lên `backdrop-blur-md` gây nóng GPU** | `StorePage.tsx:L406`, `Hero.tsx:L284` | Đổi sang hiệu ứng xuất hiện tĩnh khi cuộn tới, bỏ vòng lặp vô hạn trên lớp kính mờ |
-| 🟡 Med | M4 | **Kích thước nút chạm (Touch Target) nhỏ hơn chuẩn 44×44px** | `AppHeader.tsx`, `UserDropdown.tsx`, `StorePage.tsx`, `Footer.tsx` | Nâng nút Giỏ hàng, Đăng nhập, Xem tất cả sản phẩm, Social icons lên tối thiểu `44px` (`size-11` / `min-h-11`) |
-| 🔵 Low | M5 | **Chữ badge `9px`–`10px` quá nhỏ & lệch chiều cao thẻ sản phẩm 2 cột** | `client/components/home/ProductCard.tsx` | Nâng cỡ chữ tối thiểu lên `11px`, tinh chỉnh padding `p-3 sm:p-4` cho màn hình hẹp 360px–375px |
+| 🔴 Critical | M1 | **Thanh điều hướng Mobile (`< 768px`)** | ✅ **Đã xong** | `client/components/layout/AppHeader.tsx` |
+| 🟠 High | M2 | **Preload ảnh thú cưng tiếp theo đúng `sizes`** | ✅ **Đã xong** | `client/components/home/Hero.tsx` |
+| 🟠 High | M3 | **Bỏ `repeat: Infinity` trên `backdrop-blur-md`** | ✅ **Đã xong** | `StorePage.tsx`, `Hero.tsx` |
+| 🟡 Med | M4 | **Nâng Touch Target lên tối thiểu `44×44px`** | ✅ **Đã xong** | `AppHeader.tsx`, `UserDropdown.tsx`, `StorePage.tsx`, `Footer.tsx` |
+| 🔵 Low | M5 | **Badge tối thiểu `11px` & padding thẻ 2 cột trên mobile** | ✅ **Đã xong** | `client/components/home/ProductCard.tsx` |

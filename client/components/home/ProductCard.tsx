@@ -414,16 +414,19 @@ function ProductCardComponent({
 
   return (
     <article
-      className="group relative rounded-2xl border border-[#ECE7DF] bg-white shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#D8D2C5] hover:shadow-xl hover:shadow-stone-900/5 flex flex-col h-full justify-between overflow-hidden"
+      className="group relative rounded-2xl border border-[#ECE7DF] bg-white shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-1 hover:border-[#D8D2C5] hover:shadow-[var(--shadow-soft)] flex flex-col h-full justify-between overflow-hidden"
     >
-      <Link href={productDetailUrl} className="flex flex-col h-full justify-between">
+      <Link
+        href={productDetailUrl}
+        className="flex flex-col h-full justify-between rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-color)]"
+      >
         <div>
           <div className="relative aspect-square overflow-hidden bg-[#F7F5F0]">
             <Image
               src={productImage}
               alt={product.name}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               loading="lazy"
               className={cn(
                 "object-cover transition duration-300 group-hover:scale-105",
@@ -436,29 +439,29 @@ function ProductCardComponent({
             <div className="absolute left-2.5 top-2.5 z-10 flex flex-col items-start gap-1.5 pointer-events-none">
               {/* Badge Gợi ý cho Thú cưng kèm tên phân loại cụ thể */}
               {selectedPet && recommendedVariant && (
-                <span className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white font-black px-2.5 py-1 text-[10px] shadow-md border border-orange-300/50 animate-fadeIn">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white font-black px-2.5 py-1 text-[11px] leading-tight shadow-md border border-orange-300/50 animate-fadeIn">
                   🐾 Gợi ý cho {selectedPet.name}: {recommendedVariant.name}
                 </span>
               )}
 
               {/* Huy hiệu Sản phẩm nổi bật */}
               {product.isFeatured && (
-                <span className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 text-amber-950 font-black px-2.5 py-1 text-[10px] shadow-md border border-amber-300 animate-fadeIn">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 text-amber-950 font-black px-2.5 py-1 text-[11px] leading-tight shadow-md border border-amber-300 animate-fadeIn">
                   ⭐ Nổi bật
                 </span>
               )}
 
               {/* Trạng thái kinh doanh hoặc khuyến mãi */}
               {isProductInactive ? (
-                <span className="rounded-lg bg-stone-700 px-2.5 py-1 text-[10px] font-black text-white shadow-sm animate-fadeIn">
+                <span className="rounded-lg bg-stone-700 px-2.5 py-1 text-[11px] leading-tight font-black text-white shadow-sm animate-fadeIn">
                   Tạm ngưng bán
                 </span>
               ) : isOutOfStock ? (
-                <span className="rounded-lg bg-red-600 px-2.5 py-1 text-[10px] font-black text-white shadow-sm animate-fadeIn">
+                <span className="rounded-lg bg-red-600 px-2.5 py-1 text-[11px] leading-tight font-black text-white shadow-sm animate-fadeIn">
                   Hết hàng
                 </span>
               ) : (product.soldCount && product.soldCount >= 5) ? (
-                <span className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-red-500 px-2.5 py-1 text-[10px] font-black text-white shadow-md">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-red-500 px-2.5 py-1 text-[11px] leading-tight font-black text-white shadow-md">
                   🔥 Bán chạy
                 </span>
               ) : null}
@@ -466,15 +469,15 @@ function ProductCardComponent({
 
             {/* Low Stock Badge */}
             {effectiveTotalStock > 0 && effectiveTotalStock <= 5 && (
-              <span className="absolute top-2.5 right-2.5 rounded-lg bg-amber-600 px-2 py-0.5 text-[9px] font-black text-white shadow-xs z-10 animate-pulse">
+              <span className="absolute top-2.5 right-2.5 rounded-lg bg-amber-700 px-2 py-0.5 text-[11px] font-black tabular-nums text-white shadow-xs z-10">
                 ⚡ Chỉ còn {effectiveTotalStock}
               </span>
             )}
           </div>
 
-          <div className="space-y-2.5 p-4">
+          <div className="space-y-2 p-3 sm:p-4">
             <div className="min-h-[3.25rem]">
-              <p className="truncate text-xs font-bold uppercase tracking-[0.08em] text-stone-500">
+              <p className="truncate text-[11px] font-bold uppercase tracking-[0.08em] text-stone-500">
                 {product.brand || 'PetMatch'}
               </p>
               <h3 className="mt-1 line-clamp-2 text-sm font-bold font-heading leading-5 text-stone-900 transition duration-200 group-hover:text-[var(--primary-color)]">
@@ -482,8 +485,8 @@ function ProductCardComponent({
               </h3>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-muted)] pt-0.5">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs text-[var(--text-muted)] pt-0.5 tabular-nums">
+              <div className="flex items-center gap-1.5">
                 {product.reviewCount > 0 ? (
                   <span className="inline-flex items-center gap-1">
                     <Star className="size-3.5 fill-amber-400 text-amber-400" />
@@ -491,13 +494,13 @@ function ProductCardComponent({
                     <span>({product.reviewCount})</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-stone-400">
+                  <span className="inline-flex items-center gap-1 text-stone-500">
                     <Star className="size-3.5 text-stone-300 fill-stone-100" />
                     <span className="font-medium text-[11px]">Mới</span>
                   </span>
                 )}
                 {typeof product.soldCount === 'number' && product.soldCount > 0 && (
-                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                     Đã bán {product.soldCount >= 1000 ? `${(product.soldCount / 1000).toFixed(1)}k` : product.soldCount}
                   </span>
                 )}
@@ -510,7 +513,7 @@ function ProductCardComponent({
           </div>
         </div>
 
-        <div className="p-4 pt-0">
+        <div className="p-3 pt-0 sm:p-4 sm:pt-0">
           <div className="flex flex-col gap-1.5">
             {/* Hiển thị trực tiếp nhãn tên Phân loại được đề xuất cùng giá bán tương ứng */}
             {selectedPet && recommendedVariant && (
@@ -518,14 +521,14 @@ function ProductCardComponent({
                 <span className="text-xs">🐾</span> <strong className="font-black text-rose-900">{recommendedVariant.name}</strong>
               </span>
             )}
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 tabular-nums">
               <span className="text-base font-extrabold text-[var(--primary-color)]">{displayPriceLabel}</span>
               {hasDiscount && discountPercent > 0 && !recommendedVariant && (
                 <>
                   <span className="text-xs text-[var(--text-muted)] line-through">
                     {formatCurrency(originalSellingPrice)}
                   </span>
-                  <span className="inline-flex items-center rounded bg-red-100/80 px-1.5 py-0.5 text-[10px] font-black text-[#EE4D2D]">
+                  <span className="inline-flex items-center rounded bg-red-100/80 px-1.5 py-0.5 text-[11px] font-black text-[#C93B1E]">
                     -{discountPercent}%
                   </span>
                 </>

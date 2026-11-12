@@ -113,13 +113,16 @@ export default function Hero() {
         className="pointer-events-none absolute -bottom-10 left-1/3 h-80 w-80 rounded-full bg-emerald-100/40 blur-3xl hidden sm:block opacity-60"
         aria-hidden="true"
       />
-      {/* Preload ảnh bé cưng tiếp theo để loại bỏ giật khựng giải mã ảnh trên thiết bị di động */}
-      <div className="hidden" aria-hidden="true">
+      {/* Preload ảnh bé cưng tiếp theo đúng kích thước thẻ để loại bỏ giật khựng giải mã ảnh trên mobile */}
+      <div
+        className="pointer-events-none fixed -left-[9999px] top-0 h-[360px] w-[420px] opacity-0 overflow-hidden"
+        aria-hidden="true"
+      >
         <Image
           src={nextPet.image}
-          alt="Preload next pet"
-          width={10}
-          height={10}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
           priority
         />
       </div>
@@ -130,14 +133,14 @@ export default function Hero() {
           {/* CỘT TRÁI (7/12 cột): Thông điệp chính, giá trị cốt lõi & CTA */}
           <div className="lg:col-span-7 space-y-6">
             
-            {/* Huy hiệu định vị thương hiệu có hiệu ứng nhịp đập */}
+            {/* Huy hiệu định vị thương hiệu tinh gọn */}
             <motion.div
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2.5 rounded-full bg-white/90 px-4 py-1.5 text-xs font-bold text-orange-950 border border-orange-200/90 shadow-sm backdrop-blur-md"
+              transition={{ duration: 0.45 }}
+              className="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-1.5 text-xs font-bold text-orange-950 border border-orange-200/90 shadow-xs"
             >
-              <span className="flex h-2 w-2 rounded-full bg-[var(--primary-color)] animate-ping" />
+              <span className="h-2 w-2 rounded-full bg-[var(--primary-color)]" />
               <Sparkles className="h-4 w-4 text-[var(--primary-color)]" />
               <span>Nền tảng kết nối & chăm sóc thú cưng toàn diện #1</span>
             </motion.div>
@@ -239,7 +242,7 @@ export default function Hero() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
               className="pt-4 border-t border-stone-200/80 flex flex-wrap items-center gap-4 sm:gap-6"
             >
               <div className="flex items-center -space-x-2">
@@ -247,19 +250,18 @@ export default function Hero() {
                   { text: 'M', bg: 'bg-amber-400 text-stone-900 ring-2 ring-white' },
                   { text: 'L', bg: 'bg-emerald-400 text-stone-900 ring-2 ring-white' },
                   { text: 'B', bg: 'bg-rose-400 text-stone-900 ring-2 ring-white' },
-                  { text: 'K', bg: 'bg-indigo-400 text-stone-900 ring-2 ring-white' },
+                  { text: 'K', bg: 'bg-stone-800 text-white ring-2 ring-white' },
                 ].map((avatar, idx) => (
-                  <motion.div
+                  <div
                     key={idx}
-                    whileHover={{ scale: 1.2, zIndex: 10 }}
-                    className={`inline-flex h-9 w-9 items-center justify-center rounded-full font-extrabold text-xs shadow-xs cursor-pointer ${avatar.bg}`}
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-xl font-extrabold text-xs shadow-xs ${avatar.bg}`}
                   >
                     {avatar.text}
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
-              <div className="text-xs sm:text-sm text-stone-600">
+              <div className="text-xs sm:text-sm text-stone-600 tabular-nums">
                 <p>
                   <span className="font-extrabold text-stone-900">12.500+ phụ huynh thú cưng</span> đã tin tưởng
                 </p>
@@ -270,7 +272,7 @@ export default function Hero() {
                     ))}
                   </div>
                   <span className="font-bold text-stone-900 text-xs">4.9 / 5</span>
-                  <span className="text-stone-400 text-xs">(3.800+ lượt đánh giá thực tế)</span>
+                  <span className="text-stone-500 text-xs">(3.800+ lượt đánh giá thực tế)</span>
                 </div>
               </div>
             </motion.div>
@@ -280,40 +282,36 @@ export default function Hero() {
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto w-full max-w-md lg:max-w-none">
               
-              {/* Thẻ nổi lơ lửng góc trên phải: Thông báo Spa vừa hoàn thành */}
+              {/* Thẻ nổi góc trên phải: Thông báo Spa vừa hoàn thành (xuất hiện 1 lần, không lặp vô hạn trên backdrop-blur) */}
               <motion.div
-                animate={{
-                  y: [0, -8, 0],
-                  rotate: [0, 1.5, 0],
-                }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-6 -right-3 z-30 hidden sm:flex items-center gap-2.5 rounded-2xl bg-white/95 px-3.5 py-2.5 shadow-xl border border-emerald-100 backdrop-blur-md"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.25 }}
+                className="absolute -top-8 -right-3 z-30 hidden sm:flex items-center gap-2.5 rounded-2xl bg-white/95 px-3.5 py-2.5 shadow-[var(--shadow-soft)] border border-emerald-200/80 ring-1 ring-inset ring-white/80 backdrop-blur-md"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
                   <Scissors className="h-4 w-4" />
                 </div>
                 <div className="text-xs">
-                  <p className="font-bold text-stone-900 flex items-center gap-1">
+                  <p className="font-bold text-stone-900 flex items-center gap-1.5">
                     Spa Hoàng Gia
-                    <span className="text-[10px] font-extrabold text-amber-500">★ 5.0</span>
+                    <span className="text-[11px] font-extrabold tabular-nums text-amber-600">★ 5.0</span>
                   </p>
-                  <p className="text-[11px] text-stone-500">Bé cưng vừa hoàn thành liệu trình</p>
+                  <p className="text-[11px] text-stone-600">Bé cưng vừa hoàn thành liệu trình</p>
                 </div>
               </motion.div>
 
-              {/* Thẻ nổi lơ lửng góc dưới trái: Huy hiệu xác thực an toàn */}
+              {/* Thẻ nổi góc dưới trái: Huy hiệu xác thực an toàn */}
               <motion.div
-                animate={{
-                  y: [0, 8, 0],
-                  rotate: [0, -1.5, 0],
-                }}
-                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                className="absolute -bottom-6 -left-3 z-30 hidden sm:flex items-center gap-2 rounded-2xl bg-white/95 px-3.5 py-2.5 shadow-xl border border-rose-100 backdrop-blur-md"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.35 }}
+                className="absolute -bottom-5 -left-2 z-30 hidden sm:flex items-center gap-2 rounded-2xl bg-white/95 px-3.5 py-2.5 shadow-[var(--shadow-soft)] border border-rose-200/80 ring-1 ring-inset ring-white/80 backdrop-blur-md"
               >
                 <ShieldCheck className="h-5 w-5 text-rose-500" />
                 <div className="text-xs">
                   <p className="font-bold text-stone-900">100% Hồ sơ xác thực</p>
-                  <p className="text-[11px] text-stone-500">Đã kiểm tra tiêm chủng & phả hệ</p>
+                  <p className="text-[11px] text-stone-600">Đã kiểm tra tiêm chủng & phả hệ</p>
                 </div>
               </motion.div>
 
@@ -423,7 +421,7 @@ export default function Hero() {
                   </div>
 
                   <p className="text-xs text-stone-600 line-clamp-1 italic">
-                    "{currentPet.story}"
+                    &ldquo;{currentPet.story}&rdquo;
                   </p>
 
                   {/* Bộ 3 nút điều khiển quẹt thẻ tương tác phản hồi tức thì (120 FPS trên di động) */}

@@ -6,12 +6,14 @@ import { usePathname } from 'next/navigation';
 import {
   ChevronDown,
   Heart,
+  Menu,
   MessageCircle,
   PawPrint,
   Scissors,
   Search,
   ShoppingCart,
   Store,
+  X,
 } from 'lucide-react';
 import { BrandMark } from '@/components/auth/AuthShell';
 import UserDropdown from '@/components/home/UserDropdown';
@@ -35,6 +37,8 @@ export default function AppHeader({ sectionLabel = 'Trang chủ' }: AppHeaderPro
   const { cartCount } = useCart();
   const [isManagerOrStaff, setIsManagerOrStaff] = useState(false);
   const [matchingMenuOpen, setMatchingMenuOpen] = useState(false);
+  const [mobileMenuPath, setMobileMenuPath] = useState<string | null>(null);
+  const mobileMenuOpen = mobileMenuPath === pathname;
   const isMatchingSection = MATCHING_NAV.some(
     ({ href }) => pathname === href || pathname.startsWith(`${href}/`),
   );
@@ -69,18 +73,24 @@ export default function AppHeader({ sectionLabel = 'Trang chủ' }: AppHeaderPro
   }
 
   return (
-    <nav aria-label={`Điều hướng ${sectionLabel}`} className="sticky top-0 z-40 border-b border-[#ECE6DC] bg-[#FAF8F5]/92 shadow-2xs backdrop-blur-md">
-      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-6">
+    <nav aria-label={`Điều hướng ${sectionLabel}`} className="sticky top-0 z-40 border-b border-[#ECE6DC] bg-[#FAF8F5]/95 shadow-2xs backdrop-blur-md">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-stone-900 focus:px-4 focus:py-2.5 focus:text-xs focus:font-bold focus:text-white focus:shadow-lg"
+      >
+        Bỏ qua tới nội dung chính
+      </a>
+      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 md:px-6">
         {/* Brand Logo */}
         <Link
           href="/home"
-          className="flex min-w-0 items-center gap-3 rounded-md pr-2 text-foreground transition hover:opacity-85 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(228,93,28,0.16)]"
+          className="flex min-h-11 min-w-0 items-center gap-3 rounded-lg pr-2 text-foreground transition hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-color)]/40"
         >
           <BrandMark size="sm" />
           <span className="hidden leading-tight sm:block">
-            <span className="block text-lg font-extrabold tracking-normal">PetMatch</span>
-            <span className="block text-[11px] font-bold uppercase text-primary">
-              Trang chủ
+            <span className="block text-lg font-extrabold tracking-normal font-heading">PetMatch</span>
+            <span className="block text-[11px] font-bold uppercase tracking-wider text-primary">
+              {sectionLabel}
             </span>
           </span>
         </Link>
@@ -89,12 +99,13 @@ export default function AppHeader({ sectionLabel = 'Trang chủ' }: AppHeaderPro
         <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-2xl border border-border/60 bg-muted/40 p-1.5 shadow-xs backdrop-blur-md md:flex">
             <Link
               href="/shop"
+              aria-current={isShopSection ? 'page' : undefined}
               onClick={() => {
                 localStorage.removeItem('petmatch_shop_selected_pet');
                 window.dispatchEvent(new Event('shop-reset'));
               }}
               className={cn(
-                'flex items-center gap-2 px-4 py-2 rounded-xl text-[13.5px] font-bold transition-all active:scale-95',
+                'flex items-center gap-2 px-4 py-2 rounded-xl text-[13.5px] font-bold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40',
                 isShopSection
                   ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-md shadow-teal-600/25 ring-2 ring-teal-300/40'
                   : 'text-muted-foreground hover:text-foreground hover:bg-background/80 hover:shadow-xs'
@@ -105,8 +116,9 @@ export default function AppHeader({ sectionLabel = 'Trang chủ' }: AppHeaderPro
             </Link>
             <Link
               href="/spa"
+              aria-current={isSpaSection ? 'page' : undefined}
               className={cn(
-                'flex items-center gap-2 px-4 py-2 rounded-xl text-[13.5px] font-bold transition-all active:scale-95',
+                'flex items-center gap-2 px-4 py-2 rounded-xl text-[13.5px] font-bold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40',
                 isSpaSection
                   ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-300/40'
                   : 'text-muted-foreground hover:text-foreground hover:bg-background/80 hover:shadow-xs'
@@ -133,7 +145,7 @@ export default function AppHeader({ sectionLabel = 'Trang chủ' }: AppHeaderPro
                   onClick={() => setMatchingMenuOpen((open) => !open)}
                   onFocus={() => setMatchingMenuOpen(true)}
                   className={cn(
-                    'group flex items-center gap-2 rounded-xl px-4 py-2 text-[13.5px] font-bold transition-all active:scale-95',
+                    'group flex items-center gap-2 rounded-xl px-4 py-2 text-[13.5px] font-bold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/40',
                     isMatchingSection
                       ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/25 ring-2 ring-rose-300/40'
                       : 'text-muted-foreground hover:text-foreground hover:bg-background/80 hover:shadow-xs'
@@ -177,25 +189,105 @@ export default function AppHeader({ sectionLabel = 'Trang chủ' }: AppHeaderPro
             </div>
         </div>
 
-        {/* Tiện ích tài khoản */}
-        <div className="flex items-center gap-2.5">
+        {/* Tiện ích tài khoản & nút mở menu Mobile */}
+        <div className="flex items-center gap-2">
           <NotificationBell />
           <Link
             href="/cart"
-            className="relative inline-flex size-10 items-center justify-center rounded-md border border-[var(--border-color)] bg-card text-foreground shadow-sm transition hover:border-primary hover:text-primary"
+            className="relative inline-flex size-11 items-center justify-center rounded-xl border border-[var(--border-color)] bg-card text-foreground shadow-sm transition hover:border-primary hover:text-primary active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             aria-label="Giỏ hàng"
           >
             <ShoppingCart className="size-5" />
             {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-sm animate-in zoom-in-50 duration-200">
+              <span className="absolute -right-1 -top-1 flex min-w-5 h-5 px-1 items-center justify-center rounded-full bg-primary text-[11px] font-bold tabular-nums text-primary-foreground shadow-sm animate-in zoom-in-50 duration-200">
                 {cartCount}
               </span>
             )}
           </Link>
           <UserDropdown />
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? 'Đóng menu điều hướng' : 'Mở menu điều hướng'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav"
+            onClick={() => setMobileMenuPath((prev) => (prev === pathname ? null : pathname))}
+            className="inline-flex size-11 items-center justify-center rounded-xl border border-[var(--border-color)] bg-card text-foreground shadow-sm transition hover:border-primary hover:text-primary active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 md:hidden"
+          >
+            {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
         </div>
       </div>
 
+      {/* Điều hướng Mobile (< 768px) */}
+      {mobileMenuOpen && (
+        <div
+          id="mobile-nav"
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              setMobileMenuPath(null);
+            }
+          }}
+          className="border-t border-[#ECE6DC] bg-[#FAF8F5] px-4 py-3 shadow-lg md:hidden"
+        >
+          <div className="mx-auto max-w-7xl space-y-1.5">
+            <Link
+              href="/shop"
+              aria-current={isShopSection ? 'page' : undefined}
+              onClick={() => {
+                localStorage.removeItem('petmatch_shop_selected_pet');
+                window.dispatchEvent(new Event('shop-reset'));
+                setMobileMenuPath(null);
+              }}
+              className={cn(
+                'flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-bold transition-colors',
+                isShopSection
+                  ? 'bg-teal-600 text-white shadow-xs'
+                  : 'text-stone-800 hover:bg-stone-100'
+              )}
+            >
+              <Store className={cn('size-4 shrink-0', isShopSection ? 'text-white' : 'text-teal-600')} />
+              <span>Cửa hàng</span>
+            </Link>
+            <Link
+              href="/spa"
+              aria-current={isSpaSection ? 'page' : undefined}
+              onClick={() => setMobileMenuPath(null)}
+              className={cn(
+                'flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-bold transition-colors',
+                isSpaSection
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-stone-800 hover:bg-stone-100'
+              )}
+            >
+              <Scissors className={cn('size-4 shrink-0', isSpaSection ? 'text-white' : 'text-emerald-600')} />
+              <span>Spa & Làm đẹp</span>
+            </Link>
+            <div className="pt-2 pb-1 px-3.5">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-stone-500">Ghép đôi</p>
+            </div>
+            {MATCHING_NAV.map(({ label, href, icon: Icon }) => {
+              const active = pathname === href || pathname.startsWith(`${href}/`);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={active ? 'page' : undefined}
+                  onClick={() => setMobileMenuPath(null)}
+                  className={cn(
+                    'flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-bold transition-colors',
+                    active
+                      ? 'bg-rose-50 text-rose-700'
+                      : 'text-stone-800 hover:bg-stone-100'
+                  )}
+                >
+                  <Icon className={cn('size-4 shrink-0', active ? 'text-rose-600' : 'text-rose-500')} />
+                  <span>{label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

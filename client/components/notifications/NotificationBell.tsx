@@ -178,10 +178,10 @@ export default function NotificationBell() {
   return (
     <Popover open={open} onOpenChange={handlePopoverChange}>
       <PopoverTrigger asChild>
-        <button type="button" aria-label={`Thông báo${unreadCount ? `, ${unreadCount} chưa đọc` : ''}`} className="relative inline-flex size-10 items-center justify-center rounded-md border border-[var(--border-color)] bg-card text-foreground shadow-sm transition hover:border-primary hover:text-primary">
+        <button type="button" aria-label={`Thông báo${unreadCount ? `, ${unreadCount} chưa đọc` : ''}`} className="relative inline-flex size-11 items-center justify-center rounded-xl border border-[var(--border-color)] bg-card text-foreground shadow-sm transition hover:border-primary hover:text-primary active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
           <Bell className="size-5" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white shadow-sm">
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold tabular-nums text-white shadow-sm">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}

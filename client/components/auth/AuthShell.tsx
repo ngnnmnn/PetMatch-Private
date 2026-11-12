@@ -31,7 +31,7 @@ export function BrandMark({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 
 export default function AuthShell({ children }: AuthShellProps) {
   return (
-    <main className="min-h-screen bg-[var(--bg-page)] font-[Inter,Outfit,ui-sans-serif,system-ui,sans-serif] text-[var(--text-main)]">
+    <main className="min-h-dvh bg-[var(--bg-page)] font-sans text-[var(--text-main)]">
       <header className="flex flex-wrap items-center justify-between gap-4 px-5 py-5 sm:flex-nowrap sm:px-8 lg:px-12">
         <Link
           href="/"

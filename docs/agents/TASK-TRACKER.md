@@ -1,6 +1,34 @@
-# 📋 PetMatch — Agent Task Tracker & Remote Handover
+# 📋 PetMatch — Agent Task Tracker & Remote / Cloud Handover
 
-> Tài liệu này được lưu trong repo (`docs/agents/TASK-TRACKER.md`) để bất kỳ Agent nào trên máy mới hoặc môi trường Remote đều nắm bắt ngay 100% bối cảnh, tiến độ và danh sách việc cần làm.
+> Tài liệu này được lưu trong repo (`docs/agents/TASK-TRACKER.md`) và được `AGENTS.md` chỉ định đọc đầu tiên ở mỗi phiên mới để bất kỳ Agent nào (Local, Cloud Session hay trên Điện thoại) đều nắm bắt ngay 100% bối cảnh, tiến độ và việc cần làm tiếp theo.
+
+---
+
+## 0. 📱 Cloud / Mobile Session Handover (Cập nhật mới nhất)
+
+### 🎯 Việc ưu tiên số 1 cho phiên tiếp theo: **GitHub Issue #2** (`ready-for-agent`)
+- **Link Spec đầy đủ:** https://github.com/ngnnmnn/PetMatch-Private/issues/2 (`gh issue view 2`)
+- **Lệnh bắt đầu nhanh trên điện thoại:** `/implement #2`
+- **Suggested Skills cho Agent tiếp theo:**
+  - `implement` — Thực thi trọn gói GitHub Issue #2 và chạy kiểm thử cuối phiên.
+  - `modern-web-guidance` — **Bắt buộc** tra cứu (`retrieve`) trước khi sửa HTML/CSS/JS client (`ime-safe-enter-submit`, `autofill-sign-in-form`, `optimize-image-priority`, `js`).
+  - `tdd` — Viết test Playwright E2E cho luồng khách vãng lai (guest `401` / `/spa/book`), IME Enter và autofill `/login` trước/cùng lúc sửa code.
+  - `code-review-and-quality` (hoặc `code-review`) — Rà soát chất lượng diff trước khi merge/push.
+
+| Mức | Mã | Hạng mục trong Issue #2 | Vị trí chính | Trạng thái |
+|---|---|---|---|---|
+| 🔴 High | A1 | **Khách chưa đăng nhập bị báo nhầm `"Phiên đăng nhập đã hết hạn"` & bị đá khỏi `/spa/book`** | `client/lib/axios.ts`, `client/app/spa/book/page.tsx` | 📋 Sẵn sàng (`#2`) |
+| 🔴 High | MWG-1 | **Lỗi gõ tiếng Việt (Telex/VNI) bấm `Enter` bị nhảy tìm kiếm sớm (`ime-safe-enter-submit`)** | `client/components/home/SearchFilterBar.tsx` | 📋 Sẵn sàng (`#2`) |
+| 🟠 Med | MWG-2 | **Bổ sung `autoComplete="current-password"`, `htmlFor`/`id`, tắt spellcheck & thêm `enterKeyHint` (`autofill-sign-in-form`)** | `client/components/auth/LoginForm.tsx` | 📋 Sẵn sàng (`#2`) |
+| 🟡 Low | MWG-3 | **Thay 8 chỗ `[...arr].sort(...)` sang `.toSorted(...)` & thêm `loading="lazy"` cho `<img>` offscreen** | `explore`, `manager`, `spa/bookings`, `spa-bookings-panel`, `product/[id]`, `PetPublicProfileDialog` | 📋 Sẵn sàng (`#2`) |
+
+### ✅ Vừa hoàn thành gần nhất trên `main`:
+- **Commit `4ad8d84` (Đã deploy lên `https://petmatch.io.vn`, đóng Issue #1):** Hoàn thành toàn bộ UI/UX Pro Max Trang chủ & Mobile (`W1–W3`, `W7`, `M1–M5`), trang 404, và 10/10 Playwright E2E tests.
+- **Commit `e7cb6b2` (Đã push lên `origin/main`):**
+  - Đồng bộ font `Plus Jakarta Sans` toàn site (xóa inline `fontFamily: 'Inter, Outfit...'` ở `client/app/shop/page.tsx` và `client/app/product/[id]/page.tsx`, đổi `sectionLabel="Store"` → `"Cửa hàng"`).
+  - Tách màu active trên `AppHeader.tsx` giữa `Cửa hàng` (`teal-700 → cyan-700`) và `Spa & Làm đẹp` (`emerald-700 → green-700`).
+  - Xóa badge đầu Hero và thêm `whitespace-nowrap` chống gãy cụm từ tiếng Việt trên `Hero.tsx` & `StorePage.tsx`.
+- **Cài đặt skill `modern-web-guidance`:** Đã cài vào `.agents/skills/modern-web-guidance` và quét `legacy-scan` toàn bộ `client/`.
 
 ---
 
@@ -15,22 +43,15 @@
 
 ---
 
-## 2. 🖥️ Giao Diện Web & Hệ Thống (Từ đợt `/ponytail-audit`)
+## 2. 🖥️ Backlog Giao Diện Web & Backend (Từ đợt `/ponytail-audit`)
 
-### ✅ Đã giải quyết:
-- [x] **Bảo mật file `.env` trên Git:** Đã cập nhật `.gitignore` chặn `.env`, `.env.*` và thư mục báo cáo Playwright.
-- [x] **Cài đặt Playwright E2E cho Frontend:** Đã thiết lập `client/playwright.config.ts`, `client/e2e/home.spec.ts` và các script `npm run test:e2e`, `npm run test:e2e:ui`, `npm run test:e2e:headed`.
-- [x] **Tối ưu Hero Section 120 FPS:** Đã loại bỏ GPU blur lặp vô hạn và layout thrashing khi quẹt thẻ trên thiết bị di động.
-- [x] **DevOps Phase 1:** Đã triển khai `/api/health`, Nginx Rate Limiting và Docker Healthchecks lên `https://petmatch.io.vn`.
-- [x] **Nâng cấp UI/UX Trang chủ & Điều hướng (W1, W2, W3, W7, M1–M5):** Sửa link Footer `/match` → `/explore` + bổ sung `/shop`, `/spa` và `aria-label` riêng; lọc sản phẩm theo `isValidProductForRecommendation` + thêm Empty State; sửa `params` bất đồng bộ ở `home/product/[id]/page.tsx` và tắt `ignoreBuildErrors: true`; thêm menu Mobile `< 768px`; chuẩn hóa preload ảnh Hero đúng `sizes`; bỏ `repeat: Infinity` trên lớp `backdrop-blur`; nâng touch target `≥ 44px` (gồm cả `NotificationBell`); nâng badge tối thiểu `11px` + tạo trang `not-found.tsx` (404).
-
-### 🛠️ Các hạng mục Giao diện Web (`client/`) CÒN LẠI:
+### 🛠️ Các hạng mục Giao diện Web (`client/`) CÒN LẠI (ngoài Issue #2):
 
 | Mức | # | Hạng mục trên Web (`client/`) | Vị trí file | Cách sửa ngắn gọn |
 |---|---|---|---|---|
-| 🟡 Med | W4 | **Gọi `setState` đồng bộ trong `useEffect` gây render kép khi đổi thú cưng** | `client/app/explore/page.tsx:L1506` | Bỏ `useEffect` reset `setActivePhotoIdx(0)`, truyền `key={pet.id}` vào cụm hiển thị ảnh |
-| 🟡 Med | W5 | **Dùng thẻ `<img>` thuần thay vì `<Image />` của Next.js** | `client/app/explore/page.tsx:L557, L1255` *(đã xong `UserDropdown.tsx`)* | Chuyển sang `next/image` để tự động nén WebP/AVIF và lazy-load |
-| 🟡 Med | W6 | **Chuyển trang cứng `window.location.href = "/login"` khi hết hạn token** | `client/lib/axios.ts:L55` | Tránh reload trắng toàn trang khi đang ở trang public hoặc thông báo mượt trước khi điều hướng |
+| 🟡 Med | W4 | **Gọi `setState` đồng bộ trong `useEffect` gây render kép** | `client/app/explore/page.tsx`, `client/app/shop/page.tsx`, `client/app/product/[id]/page.tsx` | Bỏ `useEffect` reset state dẫn xuất, dùng `key` hoặc tính trực tiếp khi render |
+| 🟡 Med | W5 | **Dùng thẻ `<img>` thuần thay vì `<Image />` của Next.js ở danh sách chính** | `client/app/explore/page.tsx` | Chuyển sang `next/image` (hoặc lazy-load trước trong Issue #2) |
+| 🟡 Med | W6 | **Chuyển trang cứng `window.location.href = "/login"` khi hết hạn token** | `client/lib/axios.ts` | Kết hợp xử lý mượt cùng mục `A1` trong Issue #2 |
 | 🔵 Low | W8 | **2 trang Quản lý quá lớn (>5.500 dòng/file)** | `client/app/manager/page.tsx`, `client/app/managerSpa/page.tsx` | Tách dần các Tab/Modal ra component con khi cần chỉnh sửa tính năng quản lý |
 
 ### ⚙️ Các hạng mục Backend (`server/`) CÒN LẠI:
@@ -42,14 +63,6 @@
 
 ---
 
-## 3. 📱 Giao Diện Mobile (Từ đợt `/ui-ux-pro-max` — GitHub Issue #1)
+## 3. 📱 Lịch Sử Đã Đóng: Giao Diện Mobile (GitHub Issue #1 — ✅ CLOSED)
 
-> Đặc tả chi tiết đã được xuất bản trên GitHub Issues: **Issue #1** (`gh issue view 1`). Toàn bộ M1–M5 đã được xử lý trong nhánh hiện tại; chờ commit & kiểm tra lại issue.
-
-| Mức | # | Hạng mục trên Mobile (`< 768px`) | Trạng thái | Vị trí file |
-|---|---|---|---|---|
-| 🔴 Critical | M1 | **Thanh điều hướng Mobile (`< 768px`)** | ✅ **Đã xong** | `client/components/layout/AppHeader.tsx` |
-| 🟠 High | M2 | **Preload ảnh thú cưng tiếp theo đúng `sizes`** | ✅ **Đã xong** | `client/components/home/Hero.tsx` |
-| 🟠 High | M3 | **Bỏ `repeat: Infinity` trên `backdrop-blur-md`** | ✅ **Đã xong** | `StorePage.tsx`, `Hero.tsx` |
-| 🟡 Med | M4 | **Nâng Touch Target lên tối thiểu `44×44px`** | ✅ **Đã xong** | `AppHeader.tsx`, `UserDropdown.tsx`, `StorePage.tsx`, `Footer.tsx` |
-| 🔵 Low | M5 | **Badge tối thiểu `11px` & padding thẻ 2 cột trên mobile** | ✅ **Đã xong** | `client/components/home/ProductCard.tsx` |
+> Đã hoàn thành toàn bộ `M1–M5`, `W1–W3`, `W7`, kiểm thử Playwright 10/10 và triển khai lên production (`4ad8d84`, `e7cb6b2`). Xem chi tiết tại `gh issue view 1`.
